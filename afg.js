@@ -445,3 +445,43 @@ function calculateChanges(currencies) {
     });
     return currencies;
 }
+document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const messageDiv = document.querySelector('.thank-you-message');
+  
+  // نمایش وضعیت
+  messageDiv.textContent = 'در حال ارسال پیام...';
+  messageDiv.style.display = 'block';
+  messageDiv.style.background = 'rgba(255, 193, 7, 0.2)';
+
+  try {
+    // استفاده از API جدید FormSubmit
+    const response = await fetch('https://formsubmit.co/ajax/nematnoorzai558@gmail.com', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(Object.fromEntries(new FormData(form)))
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      messageDiv.textContent = 'پیام با موفقیت ارسال شد!';
+      messageDiv.style.background = 'rgba(46, 204, 113, 0.2)';
+      form.reset();
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error) {
+    messageDiv.textContent = 'خطا در ارسال: ' + error.message;
+    messageDiv.style.background = 'rgba(231, 76, 60, 0.2)';
+    console.error('Error:', error);
+  }
+
+  setTimeout(() => {
+    messageDiv.style.display = 'none';
+  }, 5000);
+});
