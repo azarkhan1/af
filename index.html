@@ -257,6 +257,7 @@
     </div>
 
     <!-- Footer -->
+     
     <footer class="glassmorphism">
         <div class="footer-content">
             <div class="footer-section">
@@ -298,4 +299,40 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="afg.js"></script>
 </body>
+<div class="user-feedback">
+  <form id="feedbackForm">
+    <!-- مخفی‌سازی آدرس ایمیل شما -->
+    <input type="hidden" name="_to" value="nematnoorzai558@gmail.com">
+    <input type="hidden" name="_subject" value="پیام جدید از کاربر">
+    
+    <div class="input-group">
+      <label for="message">پیام شما:</label>
+      <textarea 
+        id="message" 
+        name="message" 
+        placeholder="نظر یا مشکلت رو اینجا بنویس..."
+        required
+      ></textarea>
+    </div>
+    
+    <div class="input-group">
+      <label for="email">ایمیل:</label>
+      <input 
+        type="email" 
+        id="email" 
+        name="_replyto"  <!-- تغییر نام فیلد برای پاسخگویی -->
+       
+    </div>
+    
+    <input type="hidden" name="_captcha" value="false">
+    <input type="text" name="_honey" style="display:none"> <!-- تله اسپم -->
+    
+    <button type="submit">
+      <i class="fas fa-paper-plane"></i> ارسال
+    </button>
+  </form>
+  
+  <div class="thank-you-message"></div>
+</div>
+<input type="hidden" name="_autoresponse" value="پیام شما دریافت شد">
 </html>
