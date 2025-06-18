@@ -728,3 +728,56 @@ body[dir="rtl"] .currency-table .currency-flag {
         grid-template-columns: 1fr;
     }
 }
+/* استایل بخش نظرات */
+.user-feedback {
+  margin-top: 50px;
+  padding: 20px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-feedback .input-group {
+  margin-bottom: 15px;
+}
+
+.user-feedback label {
+  display: block;
+  margin-bottom: 5px;
+  color: rgba(255,255,255,0.8);
+}
+
+.user-feedback textarea,
+.user-feedback input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.2);
+  color: white;
+}
+
+.user-feedback button {
+  background: #ff4757;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.user-feedback button:hover {
+  background: #e84118;
+  transform: translateY(-2px);
+}
+
+.thank-you-message {
+  display: none;
+  padding: 15px;
+  margin-top: 15px;
+  background: rgba(46, 204, 113, 0.2);
+  border-radius: 8px;
+  text-align: center;
+}
