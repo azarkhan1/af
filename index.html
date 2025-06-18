@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afghan Forex | تبادل ارز</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:,"> <!-- Disable favicon request -->
+</head>
+<body>
+
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button id="lang-en" class="active">EN</button>
+        <button id="lang-fa">دری</button>
+    </div>
+
+
+    <!-- Compact Header -->
+    <header class="glassmorphism">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-exchange-alt"></i>
+                <h1 data-lang="en">Afghan Forex</h1>
+                <h1 data-lang="fa" style="display:none">تبادل ارز افغان</h1>
+            </div>
+            <div class="gold-price">
+                <span data-lang="en">Gold: $1,950</span>
+                <span data-lang="fa" style="display:none">طلا: ۱,۹۵۰ دلار</span>
+                <i class="fas fa-chevron-up" style="color: green;"></i>
+                <span class="change positive">+0.5%</span>
+            </div>
+        </div>
+     
+    </header>
+   
+    <!-- Main Navigation -->
+    <nav class="glassmorphism">
+        <ul>
+            <li class="active" data-tab="currencies">
+                <i class="fas fa-coins"></i>
+                <span data-lang="en">Currencies</span>
+                <span data-lang="fa" style="display:none">ارزها</span>
+            </li>
+            <li data-tab="gold">
+                <i class="fas fa-gem"></i>
+                <span data-lang="en">Gold Prices</span>
+                <span data-lang="fa" style="display:none">قیمت طلا</span>
+            </li>
+            <li data-tab="charts">
+                <i class="fas fa-chart-line"></i>
+                <span data-lang="en">Charts</span>
+                <span data-lang="fa" style="display:none">نمودارها</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <i class="fas fa-moon"></i>
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round"></span>
+        </label>
+        <i class="fas fa-sun"></i>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Currencies Tab (Default) -->
+        <section id="currencies" class="tab-content active">
+            <div class="currency-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search currencies..." data-lang="en">
+                    <input type="text" placeholder="جستجوی ارزها..." data-lang="fa" style="display:none">
+                </div>
+                <div class="last-updated">
+                    <span data-lang="en">Last updated: <span id="update-time">Just now</span></span>
+                    <span data-lang="fa" style="display:none">آخرین بروزرسانی: <span id="update-time-fa">همین حالا</span></span>
+                </div>
+            </div>
+
+            <div class="currency-table-container">
+                <table class="currency-table">
+                    <thead>
+                        <tr>
+                            <th data-lang="en">Currency</th>
+                            <th data-lang="fa" style="display:none">ارز</th>
+                            <th data-lang="en">Price (AFN)</th>
+                            <th data-lang="fa" style="display:none">قیمت (افغانی)</th>
+                            <th data-lang="en">24h Change</th>
+                            <th data-lang="fa" style="display:none">تغییر ۲۴ ساعت</th>
+                            <th data-lang="en">Chart</th>
+                            <th data-lang="fa" style="display:none">نمودار</th>
+                        </tr>
+                    </thead>
+                    <tbody id="currency-data">
+                        <!-- Currency data will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Gold Prices Tab -->
+        <section id="gold" class="tab-content">
+            <div class="gold-header">
+                <h2 data-lang="en">Gold Prices in Afghanistan</h2>
+                <h2 data-lang="fa" style="display:none">قیمت طلا در افغانستان</h2>
+                <div class="gold-types">
+                    <button class="active" data-type="ounce">Ounce</button>
+                    <button data-type="gram">Gram</button>
+                    <button data-type="tola">Tola</button>
+                </div>
+            </div>
+            
+            <div class="gold-price-container">
+                <div class="gold-price-card">
+                    <div class="gold-metric">
+                        <span data-lang="en">24K Gold</span>
+                        <span data-lang="fa" style="display:none">طلای ۲۴ عیار</span>
+                    </div>
+                    <div class="gold-value">
+                        <span class="price">$1,950.25</span>
+                        <span class="change positive">+0.5%</span>
+                    </div>
+                    <div class="gold-chart">
+                        <canvas id="goldChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="gold-price-card">
+                    <div class="gold-metric">
+                        <span data-lang="en">22K Gold</span>
+                        <span data-lang="fa" style="display:none">طلای ۲۲ عیار</span>
+                    </div>
+                    <div class="gold-value">
+                        <span class="price">$1,789.50</span>
+                        <span class="change negative">-0.3%</span>
+                    </div>
+                    <div class="gold-chart">
+                        <canvas id="goldChart22k"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gold-converter">
+                <h3 data-lang="en">Gold Converter</h3>
+                <h3 data-lang="fa" style="display:none">مبدل طلا</h3>
+                <div class="converter-form">
+                    <input type="number" placeholder="Amount" data-lang="en">
+                    <input type="number" placeholder="مقدار" data-lang="fa" style="display:none">
+                    <select>
+                        <option value="gram" data-lang="en">Gram</option>
+                        <option value="gram" data-lang="fa" style="display:none">گرام</option>
+                        <option value="tola" data-lang="en">Tola</option>
+                        <option value="tola" data-lang="fa" style="display:none">توله</option>
+                        <option value="ounce" data-lang="en">Ounce</option>
+                        <option value="ounce" data-lang="fa" style="display:none">اونس</option>
+                    </select>
+                    <button data-lang="en">Convert</button>
+                    <button data-lang="fa" style="display:none">تبدیل</button>
+                </div>
+                <div class="converter-result">
+                    <span data-lang="en">Result: </span>
+                    <span data-lang="fa" style="display:none">نتیجه: </span>
+                    <span class="result-value">0 AFN</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Tab -->
+        <section id="charts" class="tab-content">
+            <div class="chart-controls">
+                <div class="chart-currency-select">
+                    <label data-lang="en">Currency:</label>
+                    <label data-lang="fa" style="display:none">ارز:</label>
+                    <select id="chart-currency-select">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="PKR">PKR</option>
+                        <option value="IRR">IRR</option>
+                    </select>
+                </div>
+                <div class="chart-period">
+                    <label data-lang="en">Period:</label>
+                    <label data-lang="fa" style="display:none">دوره:</label>
+                    <select id="chart-period-select">
+                        <option value="7d" data-lang="en">7 Days</option>
+                        <option value="7d" data-lang="fa" style="display:none">۷ روز</option>
+                        <option value="30d" data-lang="en">30 Days</option>
+                        <option value="30d" data-lang="fa" style="display:none">۳۰ روز</option>
+                        <option value="90d" data-lang="en">90 Days</option>
+                        <option value="90d" data-lang="fa" style="display:none">۹۰ روز</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="currencyChart"></canvas>
+            </div>
+            
+            <div class="chart-info">
+                <div class="info-card">
+                    <h4 data-lang="en">Highest</h4>
+                    <h4 data-lang="fa" style="display:none">بیشترین</h4>
+                    <span class="value positive">87.50 AFN</span>
+                    <span class="date">2023-06-15</span>
+                </div>
+                <div class="info-card">
+                    <h4 data-lang="en">Lowest</h4>
+                    <h4 data-lang="fa" style="display:none">کمترین</h4>
+                    <span class="value negative">72.30 AFN</span>
+                    <span class="date">2023-05-20</span>
+                </div>
+                <div class="info-card">
+                    <h4 data-lang="en">Average</h4>
+                    <h4 data-lang="fa" style="display:none">متوسط</h4>
+                    <span class="value">78.45 AFN</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- News Ticker -->
+    <div class="news-ticker glassmorphism">
+        <div class="ticker-header">
+            <h3 data-lang="en">Latest News</h3>
+            <h3 data-lang="fa" style="display:none">تازه ترین اخبار</h3>
+            <div class="ticker-controls">
+                <button id="prev-news"><i class="fas fa-chevron-left"></i></button>
+                <button id="next-news"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="ticker-container">
+            <div class="news-item active">
+                <img src="https://via.placeholder.com/100x60" alt="News">
+                <div class="news-content">
+                    <h4 data-lang="en">Afghan Central Bank Announces New Currency Policy</h4>
+                    <h4 data-lang="fa" style="display:none">بانک مرکزی افغانستان سیاست جدید ارزی اعلام کرد</h4>
+                    <p data-lang="en">The central bank has introduced measures to stabilize the AFN against foreign currencies.</p>
+                    <p data-lang="fa" style="display:none">بانک مرکزی اقداماتی برای تثبیت ارزش افغانی در مقابل ارزهای خارجی معرفی کرده است.</p>
+                </div>
+            </div>
+            <div class="news-item">
+                <img src="https://via.placeholder.com/100x60" alt="News">
+                <div class="news-content">
+                    <h4 data-lang="en">Gold Prices Reach Record High in Regional Markets</h4>
+                    <h4 data-lang="fa" style="display:none">قیمت طلا در بازارهای منطقه به بالاترین حد خود رسید</h4>
+                    <p data-lang="en">Global economic uncertainty drives investors to safe-haven assets.</p>
+                    <p data-lang="fa" style="display:none">عدم اطمینان اقتصادی جهانی سرمایه گذاران را به سمت دارایی های امن سوق می دهد.</p>
+                </div>
+            </div>
+            <!-- More news items would be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glassmorphism">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4 data-lang="en">Quick Links</h4>
+                <h4 data-lang="fa" style="display:none">لینک های سریع</h4>
+                <ul>
+                    <li><a href="#" data-lang="en">Home</a><a href="#" data-lang="fa" style="display:none">صفحه اصلی</a></li>
+                    <li><a href="#" data-lang="en">Currency Rates</a><a href="#" data-lang="fa" style="display:none">نرخ ارز</a></li>
+                    <li><a href="#" data-lang="en">Gold Prices</a><a href="#" data-lang="fa" style="display:none">قیمت طلا</a></li>
+                    <li><a href="#" data-lang="en">Historical Data</a><a href="#" data-lang="fa" style="display:none">داده های تاریخی</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 data-lang="en">Resources</h4>
+                <h4 data-lang="fa" style="display:none">منابع</h4>
+                <ul>
+                    <li><a href="#" data-lang="en">API Documentation</a><a href="#" data-lang="fa" style="display:none">مستندات API</a></li>
+                    <li><a href="#" data-lang="en">Currency Converter</a><a href="#" data-lang="fa" style="display:none">مبدل ارز</a></li>
+                    <li><a href="#" data-lang="en">Economic Calendar</a><a href="#" data-lang="fa" style="display:none">تقویم اقتصادی</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 data-lang="en">Contact</h4>
+                <h4 data-lang="fa" style="display:none">تماس</h4>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> nematnoorzai558@gamil.com</li>
+                    <li><i class="fas fa-phone"></i> +93 792266556</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Kabul, Afghanistan</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-lang="en">&copy; 2025 Afghan Forex. All rights reserved.</p>
+            <p data-lang="fa" style="display:none">&copy; 2025 تبادل ارز افغان. تمام حقوق محفوظ است.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="afg.js"></script>
+</body>
+</html>
