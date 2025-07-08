@@ -1,929 +1,892 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Cryptocurrency Market</title>
-    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    <title>TaskFlow - Personal Productivity Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --dark: #1e1e2f;
-            --darker: #161622;
-            --light: #f5f6fa;
-            --success: #00b894;
-            --danger: #d63031;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--darker);
-            color: var(--light);
-            min-height: 100vh;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-        }
-        
-        .price-up {
-            color: var(--success);
-        }
-        
-        .price-down {
-            color: var(--danger);
-        }
-        
-        #candlestick-chart {
-            height: 500px;
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .crypto-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        @keyframes pulseGreen {
-            0% { background-color: transparent; }
-            50% { background-color: rgba(0, 184, 148, 0.2); }
-            100% { background-color: transparent; }
-        }
-        
-        @keyframes pulseRed {
-            0% { background-color: transparent; }
-            50% { background-color: rgba(214, 48, 49, 0.2); }
-            100% { background-color: transparent; }
-        }
-        
-        .positive-change {
-            animation: pulseGreen 1.5s ease-out;
-        }
-        
-        .negative-change {
-            animation: pulseRed 1.5s ease-out;
-        }
-        
-        .timeframe-btn.active {
-            background: linear-gradient(to right, #6c5ce7, #0984e3);
-            color: white;
-        }
-        
-        .crypto-logo {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-        }
-    </style>
-</head>
-<body class="antialiased">
-    <!-- Navbar -->
-    <nav class="glass-card fixed top-0 left-0 right-0 z-50 py-4 px-6 flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-            </svg>
-            <span class="text-xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">CryptoVision</span>
-        </div>
-        <div class="flex items-center space-x-4">
-            <button class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:opacity-90 transition-opacity">
-                Connect Wallet
-            </button>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 pt-24 pb-12">
-        <!-- Market Overview -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-            <div class="glass-card p-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-400 text-sm">Total Market Cap</p>
-                        <h3 class="text-2xl font-bold text-white mt-1" id="market-cap">$1.42T</h3>
-                    </div>
-                    <div class="text-success flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="ml-1" id="market-cap-change">2.34%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="glass-card p-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-400 text-sm">24h Volume</p>
-                        <h3 class="text-2xl font-bold text-white mt-1" id="market-volume">$48.7B</h3>
-                    </div>
-                    <div class="text-success flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="ml-1" id="volume-change">12.5%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="glass-card p-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-400 text-sm">BTC Dominance</p>
-                        <h3 class="text-2xl font-bold text-white mt-1" id="btc-dominance">48.2%</h3>
-                    </div>
-                    <div class="text-danger flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1v-5a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="ml-1" id="btc-dominance-change">0.8%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="glass-card p-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-gray-400 text-sm">Fear & Greed Index</p>
-                        <h3 class="text-2xl font-bold text-white mt-1">64</h3>
-                    </div>
-                    <div class="text-success">
-                        <span class="text-sm">Greed</span>
-                    </div>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2 mt-3">
-                    <div class="bg-yellow-400 h-2 rounded-full" style="width: 64%"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Interactive Candlestick Chart -->
-        <div class="glass-card p-6 mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-white">BTC/USDT</h2>
-                <div class="flex space-x-2">
-                    <button id="timeframe-1h" class="timeframe-btn px-3 py-1 text-sm rounded-lg bg-gray-700 text-white hover:bg-gray-600">1H</button>
-                    <button id="timeframe-4h" class="timeframe-btn px-3 py-1 text-sm rounded-lg bg-gray-700 text-white hover:bg-gray-600">4H</button>
-                    <button id="timeframe-1d" class="timeframe-btn px-3 py-1 text-sm rounded-lg bg-purple-600 text-white active">1D</button>
-                    <button id="timeframe-1w" class="timeframe-btn px-3 py-1 text-sm rounded-lg bg-gray-700 text-white hover:bg-gray-600">1W</button>
-                </div>
-            </div>
-            <div id="candlestick-chart"></div>
-        </div>
-        
-        <!-- Top Cryptocurrencies -->
-        <div class="glass-card p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-white">Top Cryptocurrencies</h2>
-                <div class="relative">
-                    <input type="text" id="search-crypto" placeholder="Search..." class="bg-gray-800 text-white rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-gray-400 text-left border-b border-gray-700">
-                            <th class="pb-3 pl-4">#</th>
-                            <th class="pb-3">Name</th>
-                            <th class="pb-3 text-right">Price</th>
-                            <th class="pb-3 text-right">24h %</th>
-                            <th class="pb-3 text-right">Market Cap</th>
-                            <th class="pb-3 pr-4 text-right">Last 7 Days</th>
-                        </tr>
-                    </thead>
-                    <tbody id="crypto-table">
-                        <!-- Crypto data will be inserted here by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="flex justify-center mt-6">
-                <button id="load-more" class="px-6 py-2 rounded-lg bg-gray-700 text-white font-medium hover:bg-gray-600 transition-colors">
-                    Load More
-                </button>
-            </div>
-        </div>
-    </main>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-        // Initialize candlestick chart
-        const chartContainer = document.getElementById('candlestick-chart');
-        const chart = LightweightCharts.createChart(chartContainer, {
-            layout: {
-                background: { color: 'transparent' },
-                textColor: '#D9D9D9',
-            },
-            grid: {
-                vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
-                horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
-            },
-            crosshair: {
-                mode: LightweightCharts.CrosshairMode.Normal,
-            },
-            rightPriceScale: {
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-            },
-            timeScale: {
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-            },
-        });
-
-        const candlestickSeries = chart.addCandlestickSeries({
-            upColor: '#00b894',
-            downColor: '#d63031',
-            borderDownColor: '#d63031',
-            borderUpColor: '#00b894',
-            wickDownColor: '#d63031',
-            wickUpColor: '#00b894',
-        });
-
-        // Crypto logo URLs (fixed to use reliable sources)
-        const cryptoLogos = {
-            bitcoin: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-            ethereum: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-            binancecoin: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
-            solana: 'https://cryptologos.cc/logos/solana-sol-logo.png',
-            ripple: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
-            cardano: 'https://cryptologos.cc/logos/cardano-ada-logo.png',
-            dogecoin: 'https://cryptologos.cc/logos/dogecoin-doge-logo.png',
-            polkadot: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.png',
-            tether: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-            litecoin: 'https://cryptologos.cc/logos/litecoin-ltc-logo.png'
-        };
-
-        // Generate initial candlestick data with different timeframes
-        function generateCandles(timeframe) {
-            const now = new Date();
-            const candles = [];
-            let previousClose = 50000;
-            let minutesPerCandle;
-            let candleCount;
-            
-            switch(timeframe) {
-                case '1h':
-                    minutesPerCandle = 5; // 12 candles per hour
-                    candleCount = 100;
-                    break;
-                case '4h':
-                    minutesPerCandle = 15; // 4 candles per hour
-                    candleCount = 100;
-                    break;
-                case '1d':
-                    minutesPerCandle = 60; // 1 candle per hour
-                    candleCount = 100;
-                    break;
-                case '1w':
-                    minutesPerCandle = 60 * 24; // 1 candle per day
-                    candleCount = 100;
-                    break;
-                default:
-                    minutesPerCandle = 60;
-                    candleCount = 100;
-            }
-            
-            for (let i = candleCount; i >= 0; i--) {
-                const time = new Date(now);
-                if (timeframe === '1w') {
-                    time.setDate(time.getDate() - i);
-                } else {
-                    time.setMinutes(time.getMinutes() - i * minutesPerCandle);
-                }
-                
-                const open = previousClose;
-                const close = open * (0.995 + Math.random() * 0.01);
-                const high = Math.max(open, close) * (1 + Math.random() * 0.005);
-                const low = Math.min(open, close) * (1 - Math.random() * 0.005);
-                
-                candles.push({
-                    time: Math.floor(time.getTime() / 1000),
-                    open,
-                    high,
-                    low,
-                    close,
-                });
-                
-                previousClose = close;
-            }
-            
-            return candles;
-        }
-
-        // Current timeframe
-        let currentTimeframe = '1d';
-        let candlestickData = generateCandles(currentTimeframe);
-
-        // Update candlestick data based on timeframe
-        function updateCandlestick() {
-            const lastCandle = candlestickData[candlestickData.length - 1];
-            const now = Math.floor(Date.now() / 1000);
-            
-            // Determine update frequency based on timeframe
-            let updateProbability;
-            switch(currentTimeframe) {
-                case '1h': updateProbability = 0.8; break;
-                case '4h': updateProbability = 0.6; break;
-                case '1d': updateProbability = 0.3; break;
-                case '1w': updateProbability = 0.1; break;
-                default: updateProbability = 0.3;
-            }
-            
-            if (Math.random() < updateProbability) {
-                const newCandle = {
-                    time: now,
-                    open: lastCandle.close,
-                    high: lastCandle.close * (1 + Math.random() * 0.002),
-                    low: lastCandle.close * (1 - Math.random() * 0.002),
-                    close: lastCandle.close * (0.999 + Math.random() * 0.002),
-                };
-                
-                candlestickData.push(newCandle);
-                
-                // Keep only last 100 candles
-                if (candlestickData.length > 100) {
-                    candlestickData.shift();
-                }
-            } else {
-                // Update current candle
-                const currentCandle = lastCandle;
-                const priceChange = currentCandle.close * (Math.random() * 0.001 - 0.0005);
-                const newClose = currentCandle.close + priceChange;
-                
-                currentCandle.close = newClose;
-                currentCandle.high = Math.max(currentCandle.high, newClose);
-                currentCandle.low = Math.min(currentCandle.low, newClose);
-            }
-            
-            candlestickSeries.setData(candlestickData);
-            chart.timeScale().fitContent();
-        }
-
-        // Sample cryptocurrency data with more coins
-        let cryptocurrencies = [
-            { id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', price: 50234.56, change24h: 1.23, marketCap: 950000000000, sparkline: generateSparklineData(50000) },
-            { id: 'ethereum', symbol: 'eth', name: 'Ethereum', price: 3245.67, change24h: -0.45, marketCap: 380000000000, sparkline: generateSparklineData(3200) },
-            { id: 'binancecoin', symbol: 'bnb', name: 'BNB', price: 412.34, change24h: 2.12, marketCap: 68000000000, sparkline: generateSparklineData(400) },
-            { id: 'solana', symbol: 'sol', name: 'Solana', price: 112.45, change24h: 5.67, marketCap: 45000000000, sparkline: generateSparklineData(110) },
-            { id: 'ripple', symbol: 'xrp', name: 'XRP', price: 0.5234, change24h: -1.23, marketCap: 28000000000, sparkline: generateSparklineData(0.52) },
-            { id: 'cardano', symbol: 'ada', name: 'Cardano', price: 0.4567, change24h: 0.89, marketCap: 16000000000, sparkline: generateSparklineData(0.45) },
-            { id: 'dogecoin', symbol: 'doge', name: 'Dogecoin', price: 0.1234, change24h: -3.45, marketCap: 17000000000, sparkline: generateSparklineData(0.12) },
-            { id: 'polkadot', symbol: 'dot', name: 'Polkadot', price: 7.89, change24h: 1.23, marketCap: 9000000000, sparkline: generateSparklineData(7.8) },
-            { id: 'tether', symbol: 'usdt', name: 'Tether', price: 1.00, change24h: 0.01, marketCap: 80000000000, sparkline: generateSparklineData(1) },
-            { id: 'litecoin', symbol: 'ltc', name: 'Litecoin', price: 70.23, change24h: -0.78, marketCap: 5000000000, sparkline: generateSparklineData(70) }
-        ];
-
-        // More cryptocurrencies to load
-        const moreCryptocurrencies = [
-            { id: 'chainlink', symbol: 'link', name: 'Chainlink', price: 15.67, change24h: 2.34, marketCap: 7000000000, sparkline: generateSparklineData(15) },
-            { id: 'polygon', symbol: 'matic', name: 'Polygon', price: 0.78, change24h: -1.23, marketCap: 6000000000, sparkline: generateSparklineData(0.78) },
-            { id: 'avalanche', symbol: 'avax', name: 'Avalanche', price: 30.45, change24h: 3.45, marketCap: 10000000000, sparkline: generateSparklineData(30) },
-            { id: 'uniswap', symbol: 'uni', name: 'Uniswap', price: 6.78, change24h: -0.56, marketCap: 4500000000, sparkline: generateSparklineData(6.8) },
-            { id: 'bitcoin-cash', symbol: 'bch', name: 'Bitcoin Cash', price: 250.67, change24h: 1.23, marketCap: 4000000000, sparkline: generateSparklineData(250) }
-        ];
-
-        // Generate sparkline data
-        function generateSparklineData(basePrice) {
-            const data = [];
-            for (let i = 0; i < 7; i++) {
-                data.push(basePrice * (0.95 + Math.random() * 0.1));
-            }
-            return data;
-        }
-
-        // Render cryptocurrency table
-        function renderCryptoTable(data = cryptocurrencies) {
-            const tableBody = document.getElementById('crypto-table');
-            tableBody.innerHTML = '';
-            
-            data.forEach((crypto, index) => {
-                const changeClass = crypto.change24h >= 0 ? 'price-up' : 'price-down';
-                const changeIcon = crypto.change24h >= 0 ? 
-                    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" /></svg>' :
-                    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1v-5a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" /></svg>';
-                
-                const row = document.createElement('tr');
-                row.className = 'crypto-card hover:bg-gray-800/50 transition-colors';
-                row.innerHTML = `
-                    <td class="py-4 pl-4 text-gray-400">${index + 1}</td>
-                    <td class="py-4">
-                        <div class="flex items-center">
-                            <img src="${cryptoLogos[crypto.id] || 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'}" alt="${crypto.name}" class="crypto-logo mr-3">
-                            <span class="font-medium text-white">${crypto.name}</span>
-                            <span class="text-gray-400 text-sm ml-2">${crypto.symbol.toUpperCase()}</span>
-                        </div>
-                    </td>
-                    <td class="py-4 text-right font-medium text-white" id="price-${crypto.id}">
-                        $${crypto.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: crypto.price < 1 ? 6 : 2 })}
-                    </td>
-                    <td class="py-4 text-right ${changeClass}">
-                        ${changeIcon}${Math.abs(crypto.change24h).toFixed(2)}%
-                    </td>
-                    <td class="py-4 text-right text-white">
-                        $${(crypto.marketCap / 1000000000).toFixed(2)}B
-                    </td>
-                    <td class="py-4 pr-4">
-                        <div class="h-10 w-32 ml-auto">
-                            <canvas id="sparkline-${crypto.id}" width="128" height="40"></canvas>
-                        </div>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-                
-                // Render sparkline chart
-                renderSparklineChart(`sparkline-${crypto.id}`, crypto.sparkline, crypto.change24h >= 0);
-            });
-        }
-
-        // Render sparkline chart
-        function renderSparklineChart(canvasId, data, isPositive) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Create gradient
-            const gradient = ctx.createLinearGradient(0, 0, 0, 40);
-            gradient.addColorStop(0, isPositive ? 'rgba(0, 184, 148, 0.3)' : 'rgba(214, 48, 49, 0.3)');
-            gradient.addColorStop(1, 'transparent');
-            
-            // Find min and max for scaling
-            const min = Math.min(...data);
-            const max = Math.max(...data);
-            const range = max - min;
-            
-            // Draw sparkline
-            ctx.beginPath();
-            ctx.moveTo(0, 40 - ((data[0] - min) / range * 40));
-            
-            for (let i = 1; i < data.length; i++) {
-                ctx.lineTo(i * (128 / (data.length - 1)), 40 - ((data[i] - min) / range * 40));
-            }
-            
-            ctx.strokeStyle = isPositive ? '#00b894' : '#d63031';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Fill area under sparkline
-            ctx.lineTo(128, 40);
-            ctx.lineTo(0, 40);
-            ctx.closePath();
-            ctx.fillStyle = gradient;
-            ctx.fill();
-        }
-
-        // Update cryptocurrency prices randomly
-        function updateCryptoPrices() {
-            cryptocurrencies.forEach(crypto => {
-                if (crypto.symbol !== 'usdt') { // Skip stablecoins
-                    // Store previous price for animation
-                    const prevPrice = crypto.price;
-                    
-                    // Generate new price with some randomness
-                    const changeFactor = 1 + (Math.random() * 0.002 - 0.001);
-                    crypto.price *= changeFactor;
-                    
-                    // Update 24h change
-                    crypto.change24h = (Math.random() * 4 - 2);
-                    
-                    // Update sparkline data
-                    crypto.sparkline.shift();
-                    crypto.sparkline.push(crypto.sparkline[crypto.sparkline.length - 1] * (0.99 + Math.random() * 0.02));
-                    
-                    // Update market cap based on new price
-                    crypto.marketCap = crypto.marketCap * changeFactor;
-                    
-                    // Update DOM if this crypto is currently displayed
-                    const priceCell = document.getElementById(`price-${crypto.id}`);
-                    if (priceCell) {
-                        // Add animation class if price changed significantly
-                        if (Math.abs(crypto.price - prevPrice) > prevPrice * 0.0005) {
-                            priceCell.classList.remove('positive-change', 'negative-change');
-                            void priceCell.offsetWidth; // Trigger reflow
-                            priceCell.classList.add(crypto.price > prevPrice ? 'positive-change' : 'negative-change');
-                        }
-                        
-                        priceCell.textContent = `$${crypto.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: crypto.price < 1 ? 6 : 2 })}`;
-                        
-                        // Update 24h change cell
-                        const changeCell = priceCell.parentElement.querySelector('.price-up, .price-down');
-                        if (changeCell) {
-                            changeCell.className = crypto.change24h >= 0 ? 'price-up' : 'price-down';
-                            changeCell.innerHTML = crypto.change24h >= 0 ? 
-                                '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" /></svg>' + 
-                                Math.abs(crypto.change24h).toFixed(2) + '%' :
-                                '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1v-5a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" /></svg>' + 
-                                Math.abs(crypto.change24h).toFixed(2) + '%';
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
                         }
                     }
                 }
-            });
-            
-            // Update market data
-            updateMarketData();
-            
-            // Re-render sparklines
-            cryptocurrencies.forEach(crypto => {
-                const canvas = document.getElementById(`sparkline-${crypto.id}`);
-                if (canvas) {
-                    renderSparklineChart(`sparkline-${crypto.id}`, crypto.sparkline, crypto.change24h >= 0);
-                }
-            });
-        }
-
-        // Update market data
-        function updateMarketData() {
-            const totalMarketCap = cryptocurrencies.reduce((sum, crypto) => sum + crypto.marketCap, 0);
-            const marketCapChange = (Math.random() * 2 - 1).toFixed(2);
-            document.getElementById('market-cap').textContent = `$${(totalMarketCap / 1000000000000).toFixed(2)}T`;
-            document.getElementById('market-cap-change').textContent = `${marketCapChange > 0 ? '+' : ''}${marketCapChange}%`;
-            document.getElementById('market-cap-change').className = marketCapChange >= 0 ? 'text-success flex items-center' : 'text-danger flex items-center';
-            
-            const totalVolume = totalMarketCap * (0.03 + Math.random() * 0.02);
-            const volumeChange = (Math.random() * 5).toFixed(1);
-            document.getElementById('market-volume').textContent = `$${(totalVolume / 1000000000).toFixed(1)}B`;
-            document.getElementById('volume-change').textContent = `+${volumeChange}%`;
-            
-            const btc = cryptocurrencies.find(c => c.symbol === 'btc');
-            const btcDominance = (btc.marketCap / totalMarketCap * 100).toFixed(1);
-            const btcDominanceChange = (Math.random() * 1 - 0.5).toFixed(1);
-            document.getElementById('btc-dominance').textContent = `${btcDominance}%`;
-            document.getElementById('btc-dominance-change').textContent = `${btcDominanceChange > 0 ? '+' : ''}${btcDominanceChange}%`;
-            document.getElementById('btc-dominance-change').className = btcDominanceChange >= 0 ? 'text-success flex items-center' : 'text-danger flex items-center';
-        }
-
-        // Change timeframe
-        function changeTimeframe(timeframe) {
-            currentTimeframe = timeframe;
-            candlestickData = generateCandles(timeframe);
-            candlestickSeries.setData(candlestickData);
-            chart.timeScale().fitContent();
-            
-            // Update active button
-            document.querySelectorAll('.timeframe-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.add('bg-gray-700');
-            });
-            document.getElementById(`timeframe-${timeframe}`).classList.add('active');
-            document.getElementById(`timeframe-${timeframe}`).classList.remove('bg-gray-700');
-        }
-
-        // Search functionality
-        function searchCryptocurrencies() {
-            const searchTerm = document.getElementById('search-crypto').value.toLowerCase();
-            const filtered = cryptocurrencies.filter(crypto => 
-                crypto.name.toLowerCase().includes(searchTerm) || 
-                crypto.symbol.toLowerCase().includes(searchTerm)
-            );
-            renderCryptoTable(filtered);
-        }
-
-        // Load more cryptocurrencies
-        function loadMoreCryptos() {
-            if (moreCryptocurrencies.length > 0) {
-                const toAdd = moreCryptocurrencies.splice(0, 5);
-                cryptocurrencies = [...cryptocurrencies, ...toAdd];
-                renderCryptoTable();
-                
-                if (moreCryptocurrencies.length === 0) {
-                    document.getElementById('load-more').style.display = 'none';
-                }
             }
         }
-
-        // Initialize
-        candlestickSeries.setData(candlestickData);
-        chart.timeScale().fitContent();
-        renderCryptoTable();
-
-        // Event listeners
-        document.getElementById('timeframe-1h').addEventListener('click', () => changeTimeframe('1h'));
-        document.getElementById('timeframe-4h').addEventListener('click', () => changeTimeframe('4h'));
-        document.getElementById('timeframe-1d').addEventListener('click', () => changeTimeframe('1d'));
-        document.getElementById('timeframe-1w').addEventListener('click', () => changeTimeframe('1w'));
-        document.getElementById('search-crypto').addEventListener('input', searchCryptocurrencies);
-        document.getElementById('load-more').addEventListener('click', loadMoreCryptos);
-
-        // Start real-time updates
-        setInterval(updateCandlestick, 1000);
-        setInterval(updateCryptoPrices, 3000);
-        
     </script>
     <style>
-  .loader-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #161622;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease;
-  }
-  
-  .loader-logo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
-  
-  .loader-spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid rgba(255,255,255,0.1);
-    border-radius: 50%;
-    border-top-color: #6c5ce7;
-    animation: spin 1s linear infinite;
-  }
-  
-  .loader-text {
-    margin-top: 20px;
-    color: #f5f6fa;
-    font-size: 18px;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
-  @keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.8; }
-  }
-</style>
-
-<div class="loader-container" id="page-loader">
-  <div class="loader-logo">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" 
-            fill="#6c5ce7"/>
-    </svg>
-  </div>
-  <div class="loader-spinner"></div>
-  <div class="loader-text">در حال بارگذاری...</div>
-</div>
-
-<script>
-  // Hide loader after 2 seconds
-  setTimeout(function() {
-    document.getElementById('page-loader').style.opacity = '0';
-    setTimeout(function() {
-      document.getElementById('page-loader').style.display = 'none';
-    }, 500);
-  }, 2000);
-</script>
-<div class="glass-card p-6 mt-8">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-white">Gold & Precious Metals Prices</h2>
-        <div class="flex items-center space-x-2">
-            <button id="gold-live" class="px-3 py-1 text-sm rounded-lg bg-purple-600 text-white">Live Prices</button>
-            <button id="gold-historical" class="px-3 py-1 text-sm rounded-lg bg-gray-700 text-white hover:bg-gray-600">Historical Data</button>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #1a202c;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4a5568;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+        
+        /* File drop zone styling */
+        .dropzone {
+            border: 2px dashed #cbd5e0;
+            transition: all 0.3s ease;
+        }
+        .dropzone-active {
+            border-color: #38bdf8;
+            background-color: rgba(56, 189, 248, 0.1);
+        }
+        .dark .dropzone {
+            border-color: #4a5568;
+        }
+        .dark .dropzone-active {
+            border-color: #38bdf8;
+            background-color: rgba(56, 189, 248, 0.15);
+        }
+        
+        /* Animation for notifications */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        .notification-slide-in {
+            animation: slideIn 0.3s forwards;
+        }
+        .notification-slide-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
+        /* Profile picture preview */
+        .profile-pic-preview {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+    <!-- Notification System -->
+    <div id="notification-area" class="fixed bottom-4 right-4 z-50 space-y-2 w-64"></div>
+    
+    <!-- Landing Page -->
+    <div id="landing-page" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-tasks text-primary-600 dark:text-primary-400 text-2xl"></i>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">TaskFlow</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    <button id="login-btn" class="px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors">
+                        Login
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Hero Section -->
+        <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="mb-8 flex justify-center">
+                    <div class="bg-primary-100 dark:bg-primary-900 p-6 rounded-full">
+                        <i class="fas fa-tasks text-primary-600 dark:text-primary-300 text-5xl"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+                    Organize Your Life with <span class="text-primary-600 dark:text-primary-400">TaskFlow</span>
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
+                    A simple yet powerful personal dashboard to manage your tasks, notes, and files - all in one place.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button id="get-started-btn" class="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-md transition-colors text-lg">
+                        Get Started
+                    </button>
+                    <button id="learn-more-btn" class="px-8 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium rounded-md transition-colors text-lg">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Features Section -->
+        <section class="py-16 bg-gray-100 dark:bg-gray-800">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Why Choose TaskFlow?</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 transition-transform hover:scale-105">
+                        <div class="text-primary-600 dark:text-primary-400 mb-4">
+                            <i class="fas fa-sticky-note text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">Smart Notes</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Jot down ideas, create checklists, and organize your thoughts with our easy-to-use note system.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 transition-transform hover:scale-105">
+                        <div class="text-primary-600 dark:text-primary-400 mb-4">
+                            <i class="fas fa-file-upload text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">File Management</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Upload and organize your documents, images, and videos in a private, secure space.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 transition-transform hover:scale-105">
+                        <div class="text-primary-600 dark:text-primary-400 mb-4">
+                            <i class="fas fa-user-shield text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">Privacy Focused</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            Your data stays on your device with our localStorage-only approach - no cloud storage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-200 dark:bg-gray-700 py-8">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-gray-600 dark:text-gray-300">
+                    &copy; 2023 TaskFlow - Your Personal Productivity Dashboard
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                <div class="px-6 py-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Welcome Back!</h3>
+                        <button id="close-login-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="login-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                        <input type="text" id="login-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Enter your username">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                        <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Enter your password">
+                    </div>
+                    
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <input id="remember-me" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
+                            <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">Forgot password?</a>
+                    </div>
+                    
+                    <button id="login-submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        Sign In
+                    </button>
+                </div>
+                
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                        Don't have an account? 
+                        <button id="switch-to-signup" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">Sign up</button>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- 18K Gold -->
-        <div class="bg-gray-800 rounded-lg p-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-300 text-sm">18K Gold (per ounce)</p>
-                    <h3 class="text-xl font-bold text-white mt-1" id="gold-18k">$1,412.50</h3>
-                </div>
-                <div class="text-success flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="ml-1" id="gold-18k-change">1.2%</span>
-                </div>
+    
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
             </div>
-            <div class="mt-3 h-20">
-                <canvas id="gold-18k-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- 24K Gold -->
-        <div class="bg-gray-800 rounded-lg p-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-300 text-sm">24K Gold (per ounce)</p>
-                    <h3 class="text-xl font-bold text-white mt-1" id="gold-24k">$1,890.75</h3>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                <div class="px-6 py-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Create Your Account</h3>
+                        <button id="close-signup-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="signup-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                        <input type="text" id="signup-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Choose a username">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="signup-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                        <input type="password" id="signup-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Create a password">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Confirm your password">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Picture</label>
+                        <div class="mt-1 flex items-center">
+                            <div id="profile-pic-preview" class="profile-pic-preview w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center overflow-hidden">
+                                <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <input type="file" id="profile-pic-input" accept="image/*" class="hidden">
+                            <button id="upload-profile-pic-btn" class="ml-4 bg-white dark:bg-gray-700 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                Upload
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button id="signup-submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        Create Account
+                    </button>
                 </div>
-                <div class="text-danger flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1v-5a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="ml-1" id="gold-24k-change">0.8%</span>
+                
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                        Already have an account? 
+                        <button id="switch-to-login" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">Log in</button>
+                    </p>
                 </div>
-            </div>
-            <div class="mt-3 h-20">
-                <canvas id="gold-24k-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- Gold Coin -->
-        <div class="bg-gray-800 rounded-lg p-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-300 text-sm">Gold Coin (1oz)</p>
-                    <h3 class="text-xl font-bold text-white mt-1" id="gold-coin">$1,925.40</h3>
-                </div>
-                <div class="text-success flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="ml-1" id="gold-coin-change">2.1%</span>
-                </div>
-            </div>
-            <div class="mt-3 h-20">
-                <canvas id="gold-coin-chart"></canvas>
-            </div>
-        </div>
-
-        <!-- Silver -->
-        <div class="bg-gray-800 rounded-lg p-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-gray-300 text-sm">Silver (per ounce)</p>
-                    <h3 class="text-xl font-bold text-white mt-1" id="silver-ounce">$28.45</h3>
-                </div>
-                <div class="text-success flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="ml-1" id="silver-ounce-change">1.5%</span>
-                </div>
-            </div>
-            <div class="mt-3 h-20">
-                <canvas id="silver-ounce-chart"></canvas>
             </div>
         </div>
     </div>
-
-    <!-- Other Precious Metals Table -->
-    <div class="mt-6 overflow-x-auto">
-        <table class="w-full">
-            <thead>
-                <tr class="text-gray-400 text-left border-b border-gray-700">
-                    <th class="pb-3">Precious Metal</th>
-                    <th class="pb-3 text-right">Price (USD)</th>
-                    <th class="pb-3 text-right">24h Change</th>
-                    <th class="pb-3 pr-4 text-right">7-Day Trend</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b border-gray-700 hover:bg-gray-800/50">
-                    <td class="py-3">
+    
+    <!-- Dashboard (Hidden by default) -->
+    <div id="dashboard" class="hidden min-h-screen flex flex-col">
+        <!-- Dashboard Header -->
+        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-tasks text-primary-600 dark:text-primary-400 text-2xl"></i>
+                    <span class="text-xl font-bold text-gray-800 dark:text-white">TaskFlow</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="dashboard-theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center focus:outline-none">
+                            <span class="sr-only">Open user menu</span>
+                            <div id="header-profile-pic" class="profile-pic-preview h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
+                                <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm ml-1 text-gray-500 dark:text-gray-400"></i>
+                        </button>
+                        
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                            <a href="#" id="profile-link" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <i class="fas fa-user-circle mr-2"></i> Your Profile
+                            </a>
+                            <a href="#" id="logout-link" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Sign out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <main class="flex-grow container mx-auto px-4 py-6">
+            <!-- Welcome Banner -->
+            <div class="bg-primary-50 dark:bg-primary-900 rounded-lg p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">Welcome, <span id="user-greeting">User</span>!</h2>
+                        <p class="text-gray-600 dark:text-gray-300">Here's your personal dashboard to organize your tasks and files.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
                         <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Gold Bullion</span>
+                            <div id="welcome-profile-pic" class="profile-pic-preview h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
+                                <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <button id="quick-add-btn" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                <i class="fas fa-plus mr-2"></i> Quick Add
+                            </button>
                         </div>
-                    </td>
-                    <td class="py-3 text-right text-white">$1,850.20</td>
-                    <td class="py-3 text-right text-success">+0.9%</td>
-                    <td class="py-3 pr-4">
-                        <div class="h-10 w-32 ml-auto">
-                            <canvas id="gold-bullion-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs Navigation -->
+            <div class="border-b border-gray-200 dark:border-gray-600 mb-6">
+                <nav class="flex -mb-px space-x-8">
+                    <button id="notes-tab" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400">
+                        <i class="fas fa-sticky-note mr-2"></i> Notes
+                    </button>
+                    <button id="files-tab" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-400">
+                        <i class="fas fa-file-upload mr-2"></i> Files
+                    </button>
+                    <button id="profile-tab" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-400">
+                        <i class="fas fa-user-circle mr-2"></i> Profile
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Notes Tab Content -->
+            <div id="notes-tab-content" class="tab-content">
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Notes</h3>
+                        <button id="add-note-btn" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                            <i class="fas fa-plus mr-1"></i> Add Note
+                        </button>
+                    </div>
+                    
+                    <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Notes will be dynamically inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Add Note Modal -->
+                <div id="note-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
                         </div>
-                    </td>
-                </tr>
-                <tr class="border-b border-gray-700 hover:bg-gray-800/50">
-                    <td class="py-3">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Platinum</span>
+                        
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        
+                        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div class="px-6 py-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="note-modal-title">Add New Note</h3>
+                                    <button id="close-note-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="note-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
+                                    <input type="text" id="note-title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Note title">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="note-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content</label>
+                                    <textarea id="note-content" rows="8" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Write your note here..."></textarea>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3">
+                                    <button id="cancel-note-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button id="save-note-btn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                        Save Note
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </td>
-                    <td class="py-3 text-right text-white">$1,025.60</td>
-                    <td class="py-3 text-right text-danger">-0.5%</td>
-                    <td class="py-3 pr-4">
-                        <div class="h-10 w-32 ml-auto">
-                            <canvas id="platinum-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Files Tab Content -->
+            <div id="files-tab-content" class="tab-content hidden">
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Files</h3>
+                        <button id="upload-files-btn" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                            <i class="fas fa-upload mr-1"></i> Upload Files
+                        </button>
+                    </div>
+                    
+                    <div id="dropzone" class="dropzone relative border-2 rounded-lg p-12 text-center cursor-pointer mb-6">
+                        <input type="file" id="file-upload-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple>
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
+                            <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">Drag & Drop Files Here</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">or click to browse your files</p>
                         </div>
-                    </td>
-                </tr>
-                <tr class="border-b border-gray-700 hover:bg-gray-800/50">
-                    <td class="py-3">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Palladium</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div id="no-files-message" class="hidden col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-file-alt text-4xl mb-4"></i>
+                            <h4 class="text-lg font-medium mb-2">No Files Yet</h4>
+                            <p>Upload your first file to get started</p>
                         </div>
-                    </td>
-                    <td class="py-3 text-right text-white">$1,456.80</td>
-                    <td class="py-3 text-right text-success">+1.8%</td>
-                    <td class="py-3 pr-4">
-                        <div class="h-10 w-32 ml-auto">
-                            <canvas id="palladium-chart"></canvas>
+                        
+                        <!-- Files will be dynamically inserted here -->
+                        <div id="files-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Files will be dynamically inserted here -->
                         </div>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-800/50">
-                    <td class="py-3">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Rhodium</span>
+                    </div>
+                </div>
+                
+                <!-- File Preview Modal -->
+                <div id="file-preview-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
                         </div>
-                    </td>
-                    <td class="py-3 text-right text-white">$4,850.00</td>
-                    <td class="py-3 text-right text-success">+2.3%</td>
-                    <td class="py-3 pr-4">
-                        <div class="h-10 w-32 ml-auto">
-                            <canvas id="rhodium-chart"></canvas>
+                        
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        
+                        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                            <div class="px-6 py-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="file-preview-title">File Preview</h3>
+                                    <button id="close-file-preview-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <div id="file-preview-content" class="mb-4">
+                                    <!-- File preview content will be inserted here -->
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button id="delete-file-btn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors mr-3">
+                                        <i class="fas fa-trash mr-1"></i> Delete
+                                    </button>
+                                    <button id="close-file-preview-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Tab Content -->
+            <div id="profile-tab-content" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-700 shadow rounded-lg overflow-hidden mb-6">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Profile Settings</h3>
+                    </div>
+                    
+                    <div class="px-6 py-4">
+                        <form id="profile-form">
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Picture</label>
+                                <div class="mt-1 flex items-center">
+                                    <div id="dashboard-profile-pic" class="profile-pic-preview w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center overflow-hidden">
+                                        <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <input type="file" id="dashboard-profile-pic-input" accept="image/*" class="hidden">
+                                        <button type="button" id="dashboard-upload-profile-pic-btn" class="bg-white dark:bg-gray-600 py-1 px-3 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                            Upload New
+                                        </button>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG or GIF (max. 2MB)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="dashboard-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                                <input type="text" id="dashboard-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label for="dashboard-current-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+                                <input type="password" id="dashboard-current-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Enter current password to make changes">
+                            </div>
+                            
+                            <div id="new-password-fields" class="hidden space-y-4 mb-4">
+                                <div>
+                                    <label for="dashboard-new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                                    <input type="password" id="dashboard-new-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="New password">
+                                </div>
+                                
+                                <div>
+                                    <label for="dashboard-confirm-new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
+                                    <input type="password" id="dashboard-confirm-new-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Confirm new password">
+                                </div>
+                            </div>
+                            
+                            <button type="button" id="change-password-btn" class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 mb-4">
+                                Change Password
+                            </button>
+                            
+                            <div class="flex justify-end mt-6">
+                                <button type="button" id="cancel-profile-changes-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors mr-3">
+                                    Cancel
+                                </button>
+                                <button type="submit" id="save-profile-btn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-gray-100 dark:bg-gray-800 py-6">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                        <i class="fas fa-tasks text-primary-600 dark:text-primary-400"></i>
+                        <span class="font-medium text-gray-800 dark:text-white">TaskFlow</span>
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                        &copy; 2023 TaskFlow - Your Personal Productivity Dashboard
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
-</div>
 
-<script>
-    // Initialize gold price charts
-    function initGoldCharts() {
-        const chartConfig = {
-            type: 'line',
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } },
-                elements: { point: { radius: 0 } }
+    <script>
+        // DOM Elements
+        const landingPage = document.getElementById('landing-page');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('login-btn');
+        const getStartedBtn = document.getElementById('get-started-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const dashboardThemeToggle = document.getElementById('dashboard-theme-toggle');
+        const loginModal = document.getElementById('login-modal');
+        const closeLoginModal = document.getElementById('close-login-modal');
+        const loginUsername = document.getElementById('login-username');
+        const loginPassword = document.getElementById('login-password');
+        const loginSubmit = document.getElementById('login-submit');
+        const switchToSignup = document.getElementById('switch-to-signup');
+        const switchToLogin = document.getElementById('switch-to-login');
+        const signupModal = document.getElementById('signup-modal');
+        const closeSignupModal = document.getElementById('close-signup-modal');
+        const signupUsername = document.getElementById('signup-username');
+        const signupPassword = document.getElementById('signup-password');
+        const signupConfirmPassword = document.getElementById('signup-confirm-password');
+        const signupSubmit = document.getElementById('signup-submit');
+        const uploadProfilePicBtn = document.getElementById('upload-profile-pic-btn');
+        const profilePicInput = document.getElementById('profile-pic-input');
+        const profilePicPreview = document.getElementById('profile-pic-preview');
+        const logoutLink = document.getElementById('logout-link');
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        const userGreeting = document.getElementById('user-greeting');
+        const headerProfilePic = document.getElementById('header-profile-pic');
+        const welcomeProfilePic = document.getElementById('welcome-profile-pic');
+        const notesTab = document.getElementById('notes-tab');
+        const filesTab = document.getElementById('files-tab');
+        const profileTab = document.getElementById('profile-tab');
+        const notesTabContent = document.getElementById('notes-tab-content');
+        const filesTabContent = document.getElementById('files-tab-content');
+        const profileTabContent = document.getElementById('profile-tab-content');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const notesContainer = document.getElementById('notes-container');
+        const noteModal = document.getElementById('note-modal');
+        const closeNoteModal = document.getElementById('close-note-modal');
+        const cancelNoteBtn = document.getElementById('cancel-note-btn');
+        const noteModalTitle = document.getElementById('note-modal-title');
+        const noteTitle = document.getElementById('note-title');
+        const noteContent = document.getElementById('note-content');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+        const uploadFilesBtn = document.getElementById('upload-files-btn');
+        const fileUploadInput = document.getElementById('file-upload-input');
+        const dropzone = document.getElementById('dropzone');
+        const filesContainer = document.getElementById('files-container');
+        const noFilesMessage = document.getElementById('no-files-message');
+        const filePreviewModal = document.getElementById('file-preview-modal');
+        const closeFilePreviewModal = document.getElementById('close-file-preview-modal');
+        const filePreviewTitle = document.getElementById('file-preview-title');
+        const filePreviewContent = document.getElementById('file-preview-content');
+        const deleteFileBtn = document.getElementById('delete-file-btn');
+        const closeFilePreviewBtn = document.getElementById('close-file-preview-btn');
+        const dashboardProfilePic = document.getElementById('dashboard-profile-pic');
+        const dashboardProfilePicInput = document.getElementById('dashboard-profile-pic-input');
+        const dashboardUploadProfilePicBtn = document.getElementById('dashboard-upload-profile-pic-btn');
+        const dashboardUsername = document.getElementById('dashboard-username');
+        const dashboardCurrentPassword = document.getElementById('dashboard-current-password');
+        const changePasswordBtn = document.getElementById('change-password-btn');
+        const newPasswordFields = document.getElementById('new-password-fields');
+        const dashboardNewPassword = document.getElementById('dashboard-new-password');
+        const dashboardConfirmNewPassword = document.getElementById('dashboard-confirm-new-password');
+        const cancelProfileChangesBtn = document.getElementById('cancel-profile-changes-btn');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        const profileForm = document.getElementById('profile-form');
+        const quickAddBtn = document.getElementById('quick-add-btn');
+        const profileLink = document.getElementById('profile-link');
+        
+        // App State
+        let currentUser = null;
+        let editingNoteId = null;
+        let previewingFileId = null;
+        let draggedFile = null;
+        
+        // Initialize the app
+        function initApp() {
+            // Check for saved theme preference
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
-        };
-
-        // Gold 18k chart
-        new Chart(
-            document.getElementById('gold-18k-chart'),
-            {
-                ...chartConfig,
-                data: {
-                    labels: Array(7).fill(''),
-                    datasets: [{
-                        data: [1400, 1405, 1410, 1412.5, 1415, 1410, 1412.5],
-                        borderColor: '#00b894',
-                        borderWidth: 2,
-                        fill: true,
-                        backgroundColor: 'rgba(0, 184, 148, 0.1)',
-                        tension: 0.4
-                    }]
+            
+            // Check if user is already logged in
+            checkLoggedInUser();
+            
+            // Setup event listeners
+            setupEventListeners();
+        }
+        
+        // Check if a user is logged in
+        function checkLoggedInUser() {
+            const loggedInUsername = localStorage.getItem('currentUser');
+            if (loggedInUsername) {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                if (users[loggedInUsername]) {
+                    currentUser = users[loggedInUsername];
+                    showDashboard();
+                    return true;
                 }
             }
-        );
-
-        // Gold 24k chart
-        new Chart(
-            document.getElementById('gold-24k-chart'),
-            {
-                ...chartConfig,
-                data: {
-                    labels: Array(7).fill(''),
-                    datasets: [{
-                        data: [1875, 1880, 1885, 1890.75, 1895, 1892, 1890.75],
-                        borderColor: '#d63031',
-                        borderWidth: 2,
-                        fill: true,
-                        backgroundColor: 'rgba(214, 48, 49, 0.1)',
-                        tension: 0.4
-                    }]
-                }
+            return false;
+        }
+        
+        // Show the dashboard
+        function showDashboard() {
+            landingPage.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            
+            // Update user info
+            userGreeting.textContent = currentUser.username;
+            updateProfilePics(currentUser.profilePic);
+            
+            // Load user data
+            loadNotes();
+            loadFiles();
+            
+            // Set up profile tab with current user data
+            dashboardUsername.value = currentUser.username;
+            
+            // Default to first tab
+            showTab('notes');
+        }
+        
+        // Update all profile pictures with the given image data
+        function updateProfilePics(imageData) {
+            if (imageData) {
+                headerProfilePic.style.backgroundImage = `url(${imageData})`;
+                welcomeProfilePic.style.backgroundImage = `url(${imageData})`;
+                dashboardProfilePic.style.backgroundImage = `url(${imageData})`;
+                profilePicPreview.style.backgroundImage = `url(${imageData})`;
+                
+                // Remove the default icon
+                headerProfilePic.innerHTML = '';
+                welcomeProfilePic.innerHTML = '';
+                dashboardProfilePic.innerHTML = '';
+                profilePicPreview.innerHTML = '';
+            } else {
+                // Reset to default icon if no image
+                headerProfilePic.style.backgroundImage = '';
+                welcomeProfilePic.style.backgroundImage = '';
+                dashboardProfilePic.style.backgroundImage = '';
+                profilePicPreview.style.backgroundImage = '';
+                
+                // Add back the default icon
+                headerProfilePic.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
+                welcomeProfilePic.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
+                dashboardProfilePic.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
+                profilePicPreview.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
             }
-        );
-
-        // Initialize other charts...
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            dashboardThemeToggle.addEventListener('click', toggleTheme);
+            
+            // Login/Signup buttons
+            loginBtn.addEventListener('click', () => showModal('login'));
+            getStartedBtn.addEventListener('click', () => showModal('login'));
+            
+            // Modal controls
+            closeLoginModal.addEventListener('click', () => hideModal('login'));
+            closeSignupModal.addEventListener('click', () => hideModal('signup'));
+            switchToSignup.addEventListener('click', () => {
+                hideModal('login');
+                setTimeout(() => showModal('signup'), 300);
+            });
+            switchToLogin.addEventListener('click', () => {
+                hideModal('signup');
+                setTimeout(() => showModal('login'), 300);
+            });
+            
+            // Login form submission
+            loginSubmit.addEventListener('click', handleLogin);
+            
+            // Signup form submission
+            signupSubmit.addEventListener('click', handleSignup);
+            
+            // Profile picture upload
+            uploadProfilePicBtn.addEventListener('click', () => profilePicInput.click());
+            profilePicInput.addEventListener('change', handleProfilePicUpload);
+            
+            dashboardUploadProfilePicBtn.addEventListener('click', () => dashboardProfilePicInput.click());
+            dashboardProfilePicInput.addEventListener('change', handleDashboardProfilePicUpload);
+            
+            // User menu
+            userMenuButton.addEventListener('click', toggleUserMenu);
+            
+            // Logout
+            logoutLink.addEventListener('click', handleLogout);
+            
+            // Dashboard tabs
+            notesTab.addEventListener('click', () => showTab('notes'));
+            filesTab.addEventListener('click', () => showTab('files'));
+            profileTab.addEventListener('click', () => showTab('profile'));
+            profileLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showTab('profile');
+            });
+            
+            // Notes functionality
+            addNoteBtn.addEventListener('click', () => openNoteModal());
+            quickAddBtn.addEventListener('click', () => openNoteModal());
+            closeNoteModal.addEventListener('click', () => closeNoteModalFunc());
+            cancelNoteBtn.addEventListener('click', () => closeNoteModalFunc());
+            saveNoteBtn.addEventListener('click', saveNote);
+            
+            // Files functionality
+            uploadFilesBtn.addEventListener('click', () => fileUploadInput.click());
+            fileUploadInput.addEventListener('change', handleFileUpload);
+            
+            // Dropzone events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, highlightDropzone, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, unhighlightDropzone, false);
+            });
+            
+            dropzone.addEventListener('drop', handleDrop, false);
+            
+            // File preview modal
+            closeFilePreviewBtn.addEventListener('click', () => filePreviewModal.classList.add('hidden'));
+            closeFilePreviewModal.addEventListener('click', () => filePreviewModal.classList.add('hidden'));
+            deleteFileBtn.addEventListener('click', deleteFile);
+            
+            // Profile functionality
+            changePasswordBtn.addEventListener('click', toggleNewPasswordFields);
+            cancelProfileChangesBtn.addEventListener('click', resetProfileForm);
+            profileForm.addEventListener('submit', saveProfileChanges);
+        }
+        
+        // Toggle theme between light/dark
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        // Show modal
+function showModal(modalType) {
+    if (modalType === 'login') {
+        loginModal.classList.remove('hidden');
+        loginUsername.focus();
+    } else if (modalType === 'signup') {
+        signupModal.classList.remove('hidden');
+        signupUsername.focus();
     }
+}
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(initGoldCharts, 2000);
-    });
+// Hide modal
+function hideModal(modalType) {
+    if (modalType === 'login') {
+        loginModal.classList.add('hidden');
+    } else if (modalType === 'signup') {
+        signupModal.classList.add('hidden');
+    }
+}
+
+// Prevent default behavior for drag and drop
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+// Highlight dropzone when dragging over
+function highlightDropzone() {
+    dropzone.classList.add('dropzone-active');
+}
+
+// Unhighlight dropzone
+function unhighlightDropzone() {
+    dropzone.classList.remove('dropzone-active');
+}
+
+// Handle dropped files
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFileUpload({ target: { files } });
+}
+
+// Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
 </html>
