@@ -1,892 +1,505 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow - Personal Productivity Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title>My Personal Cloud</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- All CSS is embedded here -->
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        :root {
+            --primary-color: #6a5af9;
+            --secondary-color: #f2f2f7;
+            --background-color: #ffffff;
+            --text-color: #1c1c1e;
+            --card-bg: #ffffff;
+            --border-color: #e5e5ea;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --font-family: 'Poppins', sans-serif;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+
+        /* Basic Setup */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.6;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+
+        /* Page Navigation Simulation */
+        .page {
+            display: none; /* Hide all pages by default */
         }
-        .dark ::-webkit-scrollbar-track {
-            background: #1a202c;
+        .page.active {
+            display: block; /* Show only the active page */
         }
-        .dark ::-webkit-scrollbar-thumb {
-            background: #4a5568;
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .dark ::-webkit-scrollbar-thumb:hover {
-            background: #718096;
-        }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none; }
+        .nav-links a { color: var(--text-color); text-decoration: none; margin-left: 1.5rem; font-weight: 600; cursor: pointer; transition: color 0.3s ease; }
+        .nav-links a:hover { color: var(--primary-color); }
+
+        /* Buttons */
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+        .btn-primary { background-color: var(--primary-color); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(106, 90, 249, 0.4); }
+
+        /* Landing Page Hero */
+        .hero-section { display: flex; align-items: center; justify-content: center; min-height: 80vh; background-color: var(--secondary-color); text-align: center; }
+        .hero-section h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+        .hero-section p { font-size: 1.2rem; color: #666; margin-bottom: 2rem; }
+
+        /* Auth Forms */
+        .auth-container { display: flex; justify-content: center; padding: 4rem 0; }
+        .form-container { background: var(--card-bg); padding: 2rem; border-radius: 12px; box-shadow: var(--shadow); width: 100%; max-width: 400px; }
+        .form-container h2 { text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
+        .form-toggle { text-align: center; margin-top: 1rem; }
+        .form-toggle a { color: var(--primary-color); font-weight: 600; cursor: pointer; }
+        #register-form { display: none; }
         
-        /* File drop zone styling */
-        .dropzone {
-            border: 2px dashed #cbd5e0;
-            transition: all 0.3s ease;
-        }
-        .dropzone-active {
-            border-color: #38bdf8;
-            background-color: rgba(56, 189, 248, 0.1);
-        }
-        .dark .dropzone {
-            border-color: #4a5568;
-        }
-        .dark .dropzone-active {
-            border-color: #38bdf8;
-            background-color: rgba(56, 189, 248, 0.15);
-        }
-        
-        /* Animation for notifications */
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-        .notification-slide-in {
-            animation: slideIn 0.3s forwards;
-        }
-        .notification-slide-out {
-            animation: slideOut 0.3s forwards;
-        }
-        
-        /* Profile picture preview */
-        .profile-pic-preview {
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+        /* Alerts */
+        .alert { padding: 1rem; margin-bottom: 1rem; border-radius: 8px; text-align: center; font-weight: 600; }
+        .alert-success { background-color: #d1e7dd; color: #0f5132; }
+        .alert-error { background-color: #f8d7da; color: #842029; }
+        #alert-box { display: none; }
+
+        /* Dashboard */
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 2rem 0; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .dashboard-header h1 { margin: 0; }
+        .profile-pic img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+        .dashboard-card { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); }
+        .dashboard-card h2 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+
+        /* Notes Section */
+        .note-form textarea { width: calc(100% - 1rem); min-height: 80px; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.5rem; margin-bottom: 1rem; resize: vertical; }
+        .note-form .btn { float: right; }
+        .notes-list { margin-top: 4rem; max-height: 400px; overflow-y: auto; clear: both; }
+        .note-item { background: var(--secondary-color); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .note-item p { margin: 0; word-break: break-word; }
+        .delete-btn { color: #e53e3e; text-decoration: none; font-weight: 600; cursor: pointer; }
+
+        /* Media Section */
+        .upload-form { margin-bottom: 1.5rem; }
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; max-height: 450px; overflow-y: auto; }
+        .media-item { text-align: center; }
+        .media-item img, .media-item video { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
+        .media-item .doc-icon { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--secondary-color); border-radius: 8px; }
+        .doc-icon span { font-size: 2.5rem; }
+        .doc-icon p, .media-title { font-size: 0.8rem; margin: 0.5rem 0 0 0; padding: 0 5px; word-break: break-all; }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
-    <!-- Notification System -->
-    <div id="notification-area" class="fixed bottom-4 right-4 z-50 space-y-2 w-64"></div>
-    
-    <!-- Landing Page -->
-    <div id="landing-page" class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
-            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-tasks text-primary-600 dark:text-primary-400 text-2xl"></i>
-                    <span class="text-xl font-bold text-gray-800 dark:text-white">TaskFlow</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:block"></i>
-                    </button>
-                    <button id="login-btn" class="px-4 py-2 text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors">
-                        Login
-                    </button>
-                </div>
+<body>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="nav-brand" id="nav-brand-link">MyCloudSpace</a>
+            <div class="nav-links">
+                <a id="nav-dashboard-link" style="display: none;">Dashboard</a>
+                <a id="nav-login-link">Login / Register</a>
+                <a id="nav-logout-link" style="display: none;">Logout</a>
             </div>
-        </header>
-        
-        <!-- Hero Section -->
-        <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-4xl mx-auto text-center">
-                <div class="mb-8 flex justify-center">
-                    <div class="bg-primary-100 dark:bg-primary-900 p-6 rounded-full">
-                        <i class="fas fa-tasks text-primary-600 dark:text-primary-300 text-5xl"></i>
-                    </div>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-                    Organize Your Life with <span class="text-primary-600 dark:text-primary-400">TaskFlow</span>
-                </h1>
-                <p class="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
-                    A simple yet powerful personal dashboard to manage your tasks, notes, and files - all in one place.
-                </p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button id="get-started-btn" class="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-md transition-colors text-lg">
-                        Get Started
-                    </button>
-                    <button id="learn-more-btn" class="px-8 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium rounded-md transition-colors text-lg">
-                        Learn More
-                    </button>
-                </div>
-            </div>
-        </main>
-        
-        <!-- Features Section -->
-        <section class="py-16 bg-gray-100 dark:bg-gray-800">
-            <div class="container mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Why Choose TaskFlow?</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 transition-transform hover:scale-105">
-                        <div class="text-primary-600 dark:text-primary-400 mb-4">
-                            <i class="fas fa-sticky-note text-4xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">Smart Notes</h3>
-                        <p class="text-gray-600 dark:text-gray-300">
-                            Jot down ideas, create checklists, and organize your thoughts with our easy-to-use note system.
-                        </p>
-                    </div>
-                    
-                    <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 transition-transform hover:scale-105">
-                        <div class="text-primary-600 dark:text-primary-400 mb-4">
-                            <i class="fas fa-file-upload text-4xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">File Management</h3>
-                        <p class="text-gray-600 dark:text-gray-300">
-                            Upload and organize your documents, images, and videos in a private, secure space.
-                        </p>
-                    </div>
-                    
-                    <div class="bg-white dark:bg-gray-700 rounded-lg shadow p-6 transition-transform hover:scale-105">
-                        <div class="text-primary-600 dark:text-primary-400 mb-4">
-                            <i class="fas fa-user-shield text-4xl"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">Privacy Focused</h3>
-                        <p class="text-gray-600 dark:text-gray-300">
-                            Your data stays on your device with our localStorage-only approach - no cloud storage.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Footer -->
-        <footer class="bg-gray-200 dark:bg-gray-700 py-8">
-            <div class="container mx-auto px-4 text-center">
-                <p class="text-gray-600 dark:text-gray-300">
-                    &copy; 2023 TaskFlow - Your Personal Productivity Dashboard
-                </p>
-            </div>
-        </footer>
-    </div>
-    
-    <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
-            </div>
-            
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div class="px-6 py-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Welcome Back!</h3>
-                        <button id="close-login-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="login-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-                        <input type="text" id="login-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Enter your username">
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                        <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Enter your password">
-                    </div>
-                    
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <input id="remember-me" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
-                            <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">Remember me</label>
-                        </div>
-                        <a href="#" class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">Forgot password?</a>
-                    </div>
-                    
-                    <button id="login-submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                        Sign In
-                    </button>
-                </div>
-                
-                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-center">
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
-                        Don't have an account? 
-                        <button id="switch-to-signup" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">Sign up</button>
-                    </p>
+        </div>
+    </nav>
+
+    <main class="main-content">
+
+        <!-- PAGE 1: Landing Page -->
+        <div id="landing-page" class="page active">
+            <div class="hero-section">
+                <div class="container">
+                    <h1>Your Personal Cloud, Reimagined.</h1>
+                    <p>Manage your daily notes and media files securely in your browser.</p>
+                    <a href="#" id="get-started-btn" class="btn btn-primary">Get Started</a>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Signup Modal -->
-    <div id="signup-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
-            </div>
-            
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div class="px-6 py-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Create Your Account</h3>
-                        <button id="close-signup-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="signup-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-                        <input type="text" id="signup-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Choose a username">
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="signup-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                        <input type="password" id="signup-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Create a password">
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
-                        <input type="password" id="signup-confirm-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Confirm your password">
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Picture</label>
-                        <div class="mt-1 flex items-center">
-                            <div id="profile-pic-preview" class="profile-pic-preview w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center overflow-hidden">
-                                <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
-                            </div>
-                            <input type="file" id="profile-pic-input" accept="image/*" class="hidden">
-                            <button id="upload-profile-pic-btn" class="ml-4 bg-white dark:bg-gray-700 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                Upload
-                            </button>
+
+        <!-- PAGE 2: Login / Register Page -->
+        <div id="auth-page" class="page">
+            <div class="auth-container">
+                <div class="form-container">
+                    <div id="alert-box" class="alert"></div>
+                    <!-- Login Form -->
+                    <form id="login-form">
+                        <h2>Login</h2>
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" required>
                         </div>
-                    </div>
-                    
-                    <button id="signup-submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                        Create Account
-                    </button>
-                </div>
-                
-                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-center">
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
-                        Already have an account? 
-                        <button id="switch-to-login" class="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">Log in</button>
-                    </p>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <p class="form-toggle">Don't have an account? <a href="#" id="show-register-link">Register here</a></p>
+                    </form>
+                    <!-- Register Form -->
+                    <form id="register-form">
+                        <h2>Register</h2>
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-picture">Profile Picture</label>
+                            <input type="file" id="profile-picture" accept="image/*">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                        <p class="form-toggle">Already have an account? <a href="#" id="show-login-link">Login here</a></p>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Dashboard (Hidden by default) -->
-    <div id="dashboard" class="hidden min-h-screen flex flex-col">
-        <!-- Dashboard Header -->
-        <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
-            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-tasks text-primary-600 dark:text-primary-400 text-2xl"></i>
-                    <span class="text-xl font-bold text-gray-800 dark:text-white">TaskFlow</span>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <button id="dashboard-theme-toggle" class="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:block"></i>
-                    </button>
-                    
-                    <div class="relative">
-                        <button id="user-menu-button" class="flex items-center focus:outline-none">
-                            <span class="sr-only">Open user menu</span>
-                            <div id="header-profile-pic" class="profile-pic-preview h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
-                                <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
-                            </div>
-                            <i class="fas fa-chevron-down text-sm ml-1 text-gray-500 dark:text-gray-400"></i>
-                        </button>
-                        
-                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                            <a href="#" id="profile-link" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <i class="fas fa-user-circle mr-2"></i> Your Profile
-                            </a>
-                            <a href="#" id="logout-link" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Sign out
-                            </a>
-                        </div>
+
+        <!-- PAGE 3: Dashboard Page -->
+        <div id="dashboard-page" class="page">
+            <div class="container dashboard-container">
+                <header class="dashboard-header">
+                    <h1 id="welcome-message">Welcome back!</h1>
+                    <div class="profile-pic">
+                        <img id="dashboard-profile-pic" src="" alt="Profile Picture">
                     </div>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Dashboard Content -->
-        <main class="flex-grow container mx-auto px-4 py-6">
-            <!-- Welcome Banner -->
-            <div class="bg-primary-50 dark:bg-primary-900 rounded-lg p-6 mb-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">Welcome, <span id="user-greeting">User</span>!</h2>
-                        <p class="text-gray-600 dark:text-gray-300">Here's your personal dashboard to organize your tasks and files.</p>
-                    </div>
-                    <div class="mt-4 md:mt-0">
-                        <div class="flex items-center">
-                            <div id="welcome-profile-pic" class="profile-pic-preview h-16 w-16 rounded-full bg-gray-200 dark:bg-gray-600 overflow-hidden">
-                                <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
-                            </div>
-                            <button id="quick-add-btn" class="ml-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                <i class="fas fa-plus mr-2"></i> Quick Add
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tabs Navigation -->
-            <div class="border-b border-gray-200 dark:border-gray-600 mb-6">
-                <nav class="flex -mb-px space-x-8">
-                    <button id="notes-tab" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400">
-                        <i class="fas fa-sticky-note mr-2"></i> Notes
-                    </button>
-                    <button id="files-tab" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-400">
-                        <i class="fas fa-file-upload mr-2"></i> Files
-                    </button>
-                    <button id="profile-tab" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-400">
-                        <i class="fas fa-user-circle mr-2"></i> Profile
-                    </button>
-                </nav>
-            </div>
-            
-            <!-- Notes Tab Content -->
-            <div id="notes-tab-content" class="tab-content">
-                <div class="mb-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Notes</h3>
-                        <button id="add-note-btn" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                            <i class="fas fa-plus mr-1"></i> Add Note
-                        </button>
-                    </div>
-                    
-                    <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Notes will be dynamically inserted here -->
-                    </div>
-                </div>
-                
-                <!-- Add Note Modal -->
-                <div id="note-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
-                        </div>
-                        
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        
-                        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <div class="px-6 py-4">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="note-modal-title">Add New Note</h3>
-                                    <button id="close-note-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="note-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
-                                    <input type="text" id="note-title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Note title">
-                                </div>
-                                
-                                <div class="mb-4">
-                                    <label for="note-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content</label>
-                                    <textarea id="note-content" rows="8" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Write your note here..."></textarea>
-                                </div>
-                                
-                                <div class="flex justify-end space-x-3">
-                                    <button id="cancel-note-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                        Cancel
-                                    </button>
-                                    <button id="save-note-btn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                        Save Note
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Files Tab Content -->
-            <div id="files-tab-content" class="tab-content hidden">
-                <div class="mb-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Your Files</h3>
-                        <button id="upload-files-btn" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                            <i class="fas fa-upload mr-1"></i> Upload Files
-                        </button>
-                    </div>
-                    
-                    <div id="dropzone" class="dropzone relative border-2 rounded-lg p-12 text-center cursor-pointer mb-6">
-                        <input type="file" id="file-upload-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" multiple>
-                        <div class="flex flex-col items-center justify-center">
-                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 dark:text-gray-500 mb-3"></i>
-                            <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">Drag & Drop Files Here</h4>
-                            <p class="text-gray-500 dark:text-gray-400 text-sm">or click to browse your files</p>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div id="no-files-message" class="hidden col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-file-alt text-4xl mb-4"></i>
-                            <h4 class="text-lg font-medium mb-2">No Files Yet</h4>
-                            <p>Upload your first file to get started</p>
-                        </div>
-                        
-                        <!-- Files will be dynamically inserted here -->
-                        <div id="files-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Files will be dynamically inserted here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- File Preview Modal -->
-                <div id="file-preview-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div class="absolute inset-0 bg-gray-500 opacity-75 dark:bg-gray-900 dark:opacity-75"></div>
-                        </div>
-                        
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        
-                        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                            <div class="px-6 py-4">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="file-preview-title">File Preview</h3>
-                                    <button id="close-file-preview-modal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                
-                                <div id="file-preview-content" class="mb-4">
-                                    <!-- File preview content will be inserted here -->
-                                </div>
-                                
-                                <div class="flex justify-end">
-                                    <button id="delete-file-btn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors mr-3">
-                                        <i class="fas fa-trash mr-1"></i> Delete
-                                    </button>
-                                    <button id="close-file-preview-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Profile Tab Content -->
-            <div id="profile-tab-content" class="tab-content hidden">
-                <div class="bg-white dark:bg-gray-700 shadow rounded-lg overflow-hidden mb-6">
-                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Profile Settings</h3>
-                    </div>
-                    
-                    <div class="px-6 py-4">
-                        <form id="profile-form">
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Picture</label>
-                                <div class="mt-1 flex items-center">
-                                    <div id="dashboard-profile-pic" class="profile-pic-preview w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center overflow-hidden">
-                                        <i class="fas fa-user text-gray-400 dark:text-gray-500"></i>
-                                    </div>
-                                    <div class="ml-4">
-                                        <input type="file" id="dashboard-profile-pic-input" accept="image/*" class="hidden">
-                                        <button type="button" id="dashboard-upload-profile-pic-btn" class="bg-white dark:bg-gray-600 py-1 px-3 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                            Upload New
-                                        </button>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG or GIF (max. 2MB)</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="dashboard-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-                                <input type="text" id="dashboard-username" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
-                            </div>
-                            
-                            <div class="mb-6">
-                                <label for="dashboard-current-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
-                                <input type="password" id="dashboard-current-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Enter current password to make changes">
-                            </div>
-                            
-                            <div id="new-password-fields" class="hidden space-y-4 mb-4">
-                                <div>
-                                    <label for="dashboard-new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
-                                    <input type="password" id="dashboard-new-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="New password">
-                                </div>
-                                
-                                <div>
-                                    <label for="dashboard-confirm-new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
-                                    <input type="password" id="dashboard-confirm-new-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white" placeholder="Confirm new password">
-                                </div>
-                            </div>
-                            
-                            <button type="button" id="change-password-btn" class="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 mb-4">
-                                Change Password
-                            </button>
-                            
-                            <div class="flex justify-end mt-6">
-                                <button type="button" id="cancel-profile-changes-btn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors mr-3">
-                                    Cancel
-                                </button>
-                                <button type="submit" id="save-profile-btn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                                    Save Changes
-                                </button>
-                            </div>
+                </header>
+                <div class="dashboard-grid">
+                    <!-- Notes Section -->
+                    <div class="dashboard-card" id="notes-section">
+                        <h2>My Notes</h2>
+                        <form id="note-form" class="note-form">
+                            <textarea id="note-content" placeholder="Write a new note..." required></textarea>
+                            <button type="submit" class="btn">Add Note</button>
                         </form>
+                        <div id="notes-list" class="notes-list">
+                            <!-- Notes will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <!-- Media Section -->
+                    <div class="dashboard-card" id="media-section">
+                        <h2>My Media</h2>
+                        <form id="upload-form" class="upload-form">
+                            <input type="file" id="file-input" required>
+                            <button type="submit" class="btn">Upload</button>
+                        </form>
+                        <div id="media-grid" class="media-grid">
+                            <!-- Media will be dynamically inserted here -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="bg-gray-100 dark:bg-gray-800 py-6">
-            <div class="container mx-auto px-4">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="flex items-center space-x-2 mb-4 md:mb-0">
-                        <i class="fas fa-tasks text-primary-600 dark:text-primary-400"></i>
-                        <span class="font-medium text-gray-800 dark:text-white">TaskFlow</span>
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-300">
-                        &copy; 2023 TaskFlow - Your Personal Productivity Dashboard
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
-
+        </div>
+    </main>
+    
+    <!-- All JavaScript is embedded here -->
     <script>
-        // DOM Elements
-        const landingPage = document.getElementById('landing-page');
-        const dashboard = document.getElementById('dashboard');
-        const loginBtn = document.getElementById('login-btn');
-        const getStartedBtn = document.getElementById('get-started-btn');
-        const themeToggle = document.getElementById('theme-toggle');
-        const dashboardThemeToggle = document.getElementById('dashboard-theme-toggle');
-        const loginModal = document.getElementById('login-modal');
-        const closeLoginModal = document.getElementById('close-login-modal');
-        const loginUsername = document.getElementById('login-username');
-        const loginPassword = document.getElementById('login-password');
-        const loginSubmit = document.getElementById('login-submit');
-        const switchToSignup = document.getElementById('switch-to-signup');
-        const switchToLogin = document.getElementById('switch-to-login');
-        const signupModal = document.getElementById('signup-modal');
-        const closeSignupModal = document.getElementById('close-signup-modal');
-        const signupUsername = document.getElementById('signup-username');
-        const signupPassword = document.getElementById('signup-password');
-        const signupConfirmPassword = document.getElementById('signup-confirm-password');
-        const signupSubmit = document.getElementById('signup-submit');
-        const uploadProfilePicBtn = document.getElementById('upload-profile-pic-btn');
-        const profilePicInput = document.getElementById('profile-pic-input');
-        const profilePicPreview = document.getElementById('profile-pic-preview');
-        const logoutLink = document.getElementById('logout-link');
-        const userMenuButton = document.getElementById('user-menu-button');
-        const userMenu = document.getElementById('user-menu');
-        const userGreeting = document.getElementById('user-greeting');
-        const headerProfilePic = document.getElementById('header-profile-pic');
-        const welcomeProfilePic = document.getElementById('welcome-profile-pic');
-        const notesTab = document.getElementById('notes-tab');
-        const filesTab = document.getElementById('files-tab');
-        const profileTab = document.getElementById('profile-tab');
-        const notesTabContent = document.getElementById('notes-tab-content');
-        const filesTabContent = document.getElementById('files-tab-content');
-        const profileTabContent = document.getElementById('profile-tab-content');
-        const addNoteBtn = document.getElementById('add-note-btn');
-        const notesContainer = document.getElementById('notes-container');
-        const noteModal = document.getElementById('note-modal');
-        const closeNoteModal = document.getElementById('close-note-modal');
-        const cancelNoteBtn = document.getElementById('cancel-note-btn');
-        const noteModalTitle = document.getElementById('note-modal-title');
-        const noteTitle = document.getElementById('note-title');
-        const noteContent = document.getElementById('note-content');
-        const saveNoteBtn = document.getElementById('save-note-btn');
-        const uploadFilesBtn = document.getElementById('upload-files-btn');
-        const fileUploadInput = document.getElementById('file-upload-input');
-        const dropzone = document.getElementById('dropzone');
-        const filesContainer = document.getElementById('files-container');
-        const noFilesMessage = document.getElementById('no-files-message');
-        const filePreviewModal = document.getElementById('file-preview-modal');
-        const closeFilePreviewModal = document.getElementById('close-file-preview-modal');
-        const filePreviewTitle = document.getElementById('file-preview-title');
-        const filePreviewContent = document.getElementById('file-preview-content');
-        const deleteFileBtn = document.getElementById('delete-file-btn');
-        const closeFilePreviewBtn = document.getElementById('close-file-preview-btn');
-        const dashboardProfilePic = document.getElementById('dashboard-profile-pic');
-        const dashboardProfilePicInput = document.getElementById('dashboard-profile-pic-input');
-        const dashboardUploadProfilePicBtn = document.getElementById('dashboard-upload-profile-pic-btn');
-        const dashboardUsername = document.getElementById('dashboard-username');
-        const dashboardCurrentPassword = document.getElementById('dashboard-current-password');
-        const changePasswordBtn = document.getElementById('change-password-btn');
-        const newPasswordFields = document.getElementById('new-password-fields');
-        const dashboardNewPassword = document.getElementById('dashboard-new-password');
-        const dashboardConfirmNewPassword = document.getElementById('dashboard-confirm-new-password');
-        const cancelProfileChangesBtn = document.getElementById('cancel-profile-changes-btn');
-        const saveProfileBtn = document.getElementById('save-profile-btn');
-        const profileForm = document.getElementById('profile-form');
-        const quickAddBtn = document.getElementById('quick-add-btn');
-        const profileLink = document.getElementById('profile-link');
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- DOM Elements ---
+        const pages = document.querySelectorAll('.page');
+        const nav = {
+            brand: document.getElementById('nav-brand-link'),
+            dashboard: document.getElementById('nav-dashboard-link'),
+            login: document.getElementById('nav-login-link'),
+            logout: document.getElementById('nav-logout-link')
+        };
+        const alertBox = document.getElementById('alert-box');
+
+        // --- State Management (using localStorage) ---
+        // WARNING: This is a simulation. Storing sensitive data like passwords
+        // in localStorage is NOT secure for a real-world application.
+        const db = {
+            // Get data from localStorage or initialize if it doesn't exist
+            getUsers: () => JSON.parse(localStorage.getItem('myCloudUsers')) || {},
+            saveUsers: (users) => localStorage.setItem('myCloudUsers', JSON.stringify(users)),
+            getNotes: () => JSON.parse(localStorage.getItem('myCloudNotes')) || {},
+            saveNotes: (notes) => localStorage.setItem('myCloudNotes', JSON.stringify(notes)),
+            getFiles: () => JSON.parse(localStorage.getItem('myCloudFiles')) || {},
+            saveFiles: (files) => localStorage.setItem('myCloudFiles', JSON.stringify(files)),
+            getCurrentUser: () => localStorage.getItem('myCloudCurrentUser'),
+            setCurrentUser: (username) => localStorage.setItem('myCloudCurrentUser', username),
+            clearCurrentUser: () => localStorage.removeItem('myCloudCurrentUser')
+        };
         
-        // App State
-        let currentUser = null;
-        let editingNoteId = null;
-        let previewingFileId = null;
-        let draggedFile = null;
-        
-        // Initialize the app
-        function initApp() {
-            // Check for saved theme preference
-            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
+        let currentUser = db.getCurrentUser();
+
+        // --- Page Navigation Logic ---
+        const showPage = (pageId) => {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            updateNav();
+        };
+
+        const updateNav = () => {
+            if (db.getCurrentUser()) {
+                nav.dashboard.style.display = 'inline';
+                nav.logout.style.display = 'inline';
+                nav.login.style.display = 'none';
             } else {
-                document.documentElement.classList.remove('dark');
+                nav.dashboard.style.display = 'none';
+                nav.logout.style.display = 'none';
+                nav.login.style.display = 'inline';
+            }
+        };
+
+        // --- Alert Logic ---
+        const showAlert = (message, type = 'error') => {
+            alertBox.textContent = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        };
+        
+        // --- Authentication Logic ---
+        const handleRegister = (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const profilePicFile = document.getElementById('profile-picture').files[0];
+
+            if (!username || !password) {
+                showAlert('Username and password are required.');
+                return;
+            }
+
+            const users = db.getUsers();
+            if (users[username]) {
+                showAlert('Username already exists.');
+                return;
             }
             
-            // Check if user is already logged in
-            checkLoggedInUser();
+            // Handle profile picture
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                users[username] = { 
+                    password: password, // In a real app, this should be hashed!
+                    profilePicDataUrl: event.target.result 
+                };
+                db.saveUsers(users);
+                showAlert('Registration successful! Please log in.', 'success');
+                showLoginForm();
+                document.getElementById('register-form').reset();
+            };
             
-            // Setup event listeners
-            setupEventListeners();
-        }
-        
-        // Check if a user is logged in
-        function checkLoggedInUser() {
-            const loggedInUsername = localStorage.getItem('currentUser');
-            if (loggedInUsername) {
-                const users = JSON.parse(localStorage.getItem('users') || '{}');
-                if (users[loggedInUsername]) {
-                    currentUser = users[loggedInUsername];
-                    showDashboard();
-                    return true;
+            if (profilePicFile) {
+                reader.readAsDataURL(profilePicFile);
+            } else {
+                // Use a default image if none is provided
+                const defaultPic = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzYxNjE2MSI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTRjLTIuNzEgMC01LjgwLTEuMjgtNy43NS0zLjI1LjgxLTEuMjcgMi40OC0yIDQuMjUtMiAxLjc3IDAgMy40NCAuNzMgNC4yNSAyQzE3LjgwIDE3LjcyIDE0LjcxIDE5IDEyIDE5eiIvPjwvc3ZnPg==';
+                users[username] = { password: password, profilePicDataUrl: defaultPic };
+                db.saveUsers(users);
+                showAlert('Registration successful! Please log in.', 'success');
+                showLoginForm();
+                document.getElementById('register-form').reset();
+            }
+        };
+
+        const handleLogin = (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const users = db.getUsers();
+
+            if (users[username] && users[username].password === password) {
+                db.setCurrentUser(username);
+                currentUser = username;
+                showPage('dashboard-page');
+                renderDashboard();
+            } else {
+                showAlert('Invalid username or password.');
+            }
+        };
+
+        const handleLogout = () => {
+            db.clearCurrentUser();
+            currentUser = null;
+            showPage('landing-page');
+        };
+
+        const showRegisterForm = () => {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            alertBox.style.display = 'none';
+        };
+
+        const showLoginForm = () => {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+        };
+
+        // --- Dashboard Logic ---
+        const renderDashboard = () => {
+            if (!currentUser) return;
+            
+            const users = db.getUsers();
+            document.getElementById('welcome-message').textContent = `Welcome back, ${currentUser}!`;
+            document.getElementById('dashboard-profile-pic').src = users[currentUser].profilePicDataUrl;
+
+            renderNotes();
+            renderFiles();
+        };
+
+        const renderNotes = () => {
+            const notesContainer = document.getElementById('notes-list');
+            notesContainer.innerHTML = '';
+            const allNotes = db.getNotes();
+            const userNotes = allNotes[currentUser] || [];
+
+            if (userNotes.length === 0) {
+                notesContainer.innerHTML = '<p>You have no notes yet.</p>';
+                return;
+            }
+
+            userNotes.slice().reverse().forEach(note => {
+                const noteEl = document.createElement('div');
+                noteEl.className = 'note-item';
+                noteEl.innerHTML = `
+                    <p>${note.content}</p>
+                    <a class="delete-btn" data-id="${note.id}">Delete</a>
+                `;
+                notesContainer.appendChild(noteEl);
+            });
+        };
+
+        const renderFiles = () => {
+            const mediaContainer = document.getElementById('media-grid');
+            mediaContainer.innerHTML = '';
+            const allFiles = db.getFiles();
+            const userFiles = allFiles[currentUser] || [];
+
+            if (userFiles.length === 0) {
+                mediaContainer.innerHTML = '<p>You have no media files yet.</p>';
+                return;
+            }
+            
+            userFiles.slice().reverse().forEach(file => {
+                const fileEl = document.createElement('div');
+                fileEl.className = 'media-item';
+                let content = '';
+
+                if (file.type.startsWith('image/')) {
+                    content = `<img src="${file.dataUrl}" alt="${file.name}">`;
+                } else if (file.type.startsWith('video/')) {
+                    content = `<video controls><source src="${file.dataUrl}" type="${file.type}"></video>`;
+                } else {
+                    content = `<div class="doc-icon"><span>📄</span><p>${file.name}</p></div>`;
                 }
+                fileEl.innerHTML = `${content}<p class="media-title">${file.name}</p>`;
+                mediaContainer.appendChild(fileEl);
+            });
+        };
+
+        const handleAddNote = (e) => {
+            e.preventDefault();
+            const content = document.getElementById('note-content').value.trim();
+            if (!content) return;
+
+            const allNotes = db.getNotes();
+            if (!allNotes[currentUser]) allNotes[currentUser] = [];
+            
+            allNotes[currentUser].push({ id: Date.now(), content: content });
+            db.saveNotes(allNotes);
+            renderNotes();
+            document.getElementById('note-form').reset();
+        };
+
+        const handleDeleteNote = (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const noteId = Number(e.target.dataset.id);
+                const allNotes = db.getNotes();
+                allNotes[currentUser] = allNotes[currentUser].filter(note => note.id !== noteId);
+                db.saveNotes(allNotes);
+                renderNotes();
             }
-            return false;
-        }
-        
-        // Show the dashboard
-        function showDashboard() {
-            landingPage.classList.add('hidden');
-            dashboard.classList.remove('hidden');
-            
-            // Update user info
-            userGreeting.textContent = currentUser.username;
-            updateProfilePics(currentUser.profilePic);
-            
-            // Load user data
-            loadNotes();
-            loadFiles();
-            
-            // Set up profile tab with current user data
-            dashboardUsername.value = currentUser.username;
-            
-            // Default to first tab
-            showTab('notes');
-        }
-        
-        // Update all profile pictures with the given image data
-        function updateProfilePics(imageData) {
-            if (imageData) {
-                headerProfilePic.style.backgroundImage = `url(${imageData})`;
-                welcomeProfilePic.style.backgroundImage = `url(${imageData})`;
-                dashboardProfilePic.style.backgroundImage = `url(${imageData})`;
-                profilePicPreview.style.backgroundImage = `url(${imageData})`;
-                
-                // Remove the default icon
-                headerProfilePic.innerHTML = '';
-                welcomeProfilePic.innerHTML = '';
-                dashboardProfilePic.innerHTML = '';
-                profilePicPreview.innerHTML = '';
+        };
+
+        const handleAddFile = (e) => {
+            e.preventDefault();
+            const file = document.getElementById('file-input').files[0];
+            if (!file) return;
+
+            // Warning for large files as localStorage has limits (usually 5-10MB)
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert("Warning: File is larger than 5MB. It may not save correctly due to browser storage limits.");
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const allFiles = db.getFiles();
+                if (!allFiles[currentUser]) allFiles[currentUser] = [];
+
+                allFiles[currentUser].push({
+                    id: Date.now(),
+                    name: file.name,
+                    type: file.type,
+                    dataUrl: event.target.result
+                });
+                db.saveFiles(allFiles);
+                renderFiles();
+                document.getElementById('upload-form').reset();
+            };
+            reader.readAsDataURL(file);
+        };
+
+
+        // --- Event Listeners ---
+        // Navigation
+        nav.brand.addEventListener('click', () => showPage('landing-page'));
+        nav.dashboard.addEventListener('click', () => showPage('dashboard-page'));
+        nav.login.addEventListener('click', () => showPage('auth-page'));
+        nav.logout.addEventListener('click', handleLogout);
+        document.getElementById('get-started-btn').addEventListener('click', () => showPage('auth-page'));
+
+        // Auth Forms
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+        document.getElementById('register-form').addEventListener('submit', handleRegister);
+        document.getElementById('show-register-link').addEventListener('click', showRegisterForm);
+        document.getElementById('show-login-link').addEventListener('click', showLoginForm);
+
+        // Dashboard Forms
+        document.getElementById('note-form').addEventListener('submit', handleAddNote);
+        document.getElementById('upload-form').addEventListener('submit', handleAddFile);
+        document.getElementById('notes-list').addEventListener('click', handleDeleteNote);
+
+
+        // --- Initial Load ---
+        const init = () => {
+            if (currentUser) {
+                showPage('dashboard-page');
+                renderDashboard();
             } else {
-                // Reset to default icon if no image
-                headerProfilePic.style.backgroundImage = '';
-                welcomeProfilePic.style.backgroundImage = '';
-                dashboardProfilePic.style.backgroundImage = '';
-                profilePicPreview.style.backgroundImage = '';
-                
-                // Add back the default icon
-                headerProfilePic.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
-                welcomeProfilePic.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
-                dashboardProfilePic.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
-                profilePicPreview.innerHTML = '<i class="fas fa-user text-gray-400 dark:text-gray-500"></i>';
+                showPage('landing-page');
             }
-        }
-        
-        // Setup event listeners
-        function setupEventListeners() {
-            // Theme toggle
-            themeToggle.addEventListener('click', toggleTheme);
-            dashboardThemeToggle.addEventListener('click', toggleTheme);
-            
-            // Login/Signup buttons
-            loginBtn.addEventListener('click', () => showModal('login'));
-            getStartedBtn.addEventListener('click', () => showModal('login'));
-            
-            // Modal controls
-            closeLoginModal.addEventListener('click', () => hideModal('login'));
-            closeSignupModal.addEventListener('click', () => hideModal('signup'));
-            switchToSignup.addEventListener('click', () => {
-                hideModal('login');
-                setTimeout(() => showModal('signup'), 300);
-            });
-            switchToLogin.addEventListener('click', () => {
-                hideModal('signup');
-                setTimeout(() => showModal('login'), 300);
-            });
-            
-            // Login form submission
-            loginSubmit.addEventListener('click', handleLogin);
-            
-            // Signup form submission
-            signupSubmit.addEventListener('click', handleSignup);
-            
-            // Profile picture upload
-            uploadProfilePicBtn.addEventListener('click', () => profilePicInput.click());
-            profilePicInput.addEventListener('change', handleProfilePicUpload);
-            
-            dashboardUploadProfilePicBtn.addEventListener('click', () => dashboardProfilePicInput.click());
-            dashboardProfilePicInput.addEventListener('change', handleDashboardProfilePicUpload);
-            
-            // User menu
-            userMenuButton.addEventListener('click', toggleUserMenu);
-            
-            // Logout
-            logoutLink.addEventListener('click', handleLogout);
-            
-            // Dashboard tabs
-            notesTab.addEventListener('click', () => showTab('notes'));
-            filesTab.addEventListener('click', () => showTab('files'));
-            profileTab.addEventListener('click', () => showTab('profile'));
-            profileLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                showTab('profile');
-            });
-            
-            // Notes functionality
-            addNoteBtn.addEventListener('click', () => openNoteModal());
-            quickAddBtn.addEventListener('click', () => openNoteModal());
-            closeNoteModal.addEventListener('click', () => closeNoteModalFunc());
-            cancelNoteBtn.addEventListener('click', () => closeNoteModalFunc());
-            saveNoteBtn.addEventListener('click', saveNote);
-            
-            // Files functionality
-            uploadFilesBtn.addEventListener('click', () => fileUploadInput.click());
-            fileUploadInput.addEventListener('change', handleFileUpload);
-            
-            // Dropzone events
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropzone.addEventListener(eventName, highlightDropzone, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, unhighlightDropzone, false);
-            });
-            
-            dropzone.addEventListener('drop', handleDrop, false);
-            
-            // File preview modal
-            closeFilePreviewBtn.addEventListener('click', () => filePreviewModal.classList.add('hidden'));
-            closeFilePreviewModal.addEventListener('click', () => filePreviewModal.classList.add('hidden'));
-            deleteFileBtn.addEventListener('click', deleteFile);
-            
-            // Profile functionality
-            changePasswordBtn.addEventListener('click', toggleNewPasswordFields);
-            cancelProfileChangesBtn.addEventListener('click', resetProfileForm);
-            profileForm.addEventListener('submit', saveProfileChanges);
-        }
-        
-        // Toggle theme between light/dark
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-        // Show modal
-function showModal(modalType) {
-    if (modalType === 'login') {
-        loginModal.classList.remove('hidden');
-        loginUsername.focus();
-    } else if (modalType === 'signup') {
-        signupModal.classList.remove('hidden');
-        signupUsername.focus();
-    }
-}
+        };
 
-// Hide modal
-function hideModal(modalType) {
-    if (modalType === 'login') {
-        loginModal.classList.add('hidden');
-    } else if (modalType === 'signup') {
-        signupModal.classList.add('hidden');
-    }
-}
-
-// Prevent default behavior for drag and drop
-function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-// Highlight dropzone when dragging over
-function highlightDropzone() {
-    dropzone.classList.add('dropzone-active');
-}
-
-// Unhighlight dropzone
-function unhighlightDropzone() {
-    dropzone.classList.remove('dropzone-active');
-}
-
-// Handle dropped files
-function handleDrop(e) {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    handleFileUpload({ target: { files } });
-}
-
-// Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', initApp);
-</script>
+        init();
+    });
+    </script>
 </body>
 </html>
