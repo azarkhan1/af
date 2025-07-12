@@ -3,490 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlassSpeed - Minimal Speed Test</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>SwiftSpeed | Minimal Internet Speed Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #8bc6ec 0%, #9599e2 100%);
-            padding: 20px;
             overflow-x: hidden;
-            color: #333;
         }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-            padding: 40px 30px;
+        
+        .glass-card {
             background: rgba(255, 255, 255, 0.25);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 100%);
             transition: all 0.3s ease;
         }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 10px;
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            background: linear-gradient(45deg, #2c3e50, #3498db);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        
+        .test-button:active {
+            transform: translateY(0);
         }
-
-        .header i {
-            font-size: 1.8rem;
-            color: #3498db;
+        
+        .speed-display {
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.5s ease;
         }
-
-        .speed-container {
-            margin: 40px 0;
-            height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        
+        .unit {
+            opacity: 0.7;
+            font-weight: 300;
         }
-
-        .speed-value {
-            font-size: 4.5rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #2c3e50, #3498db);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            line-height: 1.1;
-            transition: all 0.3s ease;
-        }
-
-        .speed-unit {
-            font-size: 1.8rem;
-            font-weight: 500;
-            color: #2c3e50;
-            margin-top: -5px;
-            opacity: 0.8;
-            transition: all 0.3s ease;
-        }
-
-        .status-text {
-            font-size: 1.1rem;
-            color: #2c3e50;
-            height: 24px;
-            margin: 15px 0 30px;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-
-        .test-btn {
-            background: linear-gradient(45deg, #3498db, #2c3e50);
-            color: white;
-            border: none;
-            padding: 16px 40px;
-            font-size: 1.2rem;
-            font-weight: 500;
-            border-radius: 50px;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .test-btn:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(45deg, #2c3e50, #3498db);
-            transition: all 0.4s;
-            z-index: -1;
-        }
-
-        .test-btn:hover:before {
-            width: 100%;
-        }
-
-        .test-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-
-        .test-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .test-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .test-btn:disabled:before {
-            width: 0%;
-        }
-
+        
         .progress-bar {
             height: 6px;
-            width: 100%;
-            background: rgba(236, 240, 241, 0.5);
+            background: rgba(255,255,255,0.5);
             border-radius: 3px;
-            margin: 25px 0 15px;
             overflow: hidden;
-            display: none;
         }
-
-        .progress {
+        
+        .progress-fill {
             height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #3498db, #2c3e50);
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
             border-radius: 3px;
-            transition: width 0.5s ease;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        .stat-box {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #2c3e50;
-            opacity: 0.7;
-        }
-
-        .footer {
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #2c3e50;
-            opacity: 0.7;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-            
-            .speed-value {
-                font-size: 3.8rem;
-            }
-            
-            .speed-unit {
-                font-size: 1.5rem;
-            }
-            
-            .test-btn {
-                padding: 14px 35px;
-                font-size: 1.1rem;
-            }
-            
-            .stats {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .speed-value {
-                font-size: 3.2rem;
-            }
-            
-            .status-text {
-                font-size: 1rem;
-            }
-            
-            .header h1 {
-                font-size: 1.5rem;
-            }
+            transition: width 0.3s ease;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <i class="fas fa-tachometer-alt"></i>
-            <h1>GlassSpeed Test</h1>
+<body class="flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md p-8 text-center">
+        <h1 class="text-2xl font-light mb-2 text-gray-700">SwiftSpeed</h1>
+        <p class="text-sm text-gray-500 mb-8">Minimal internet speed test</p>
+        
+        <div class="speed-display mb-8">
+            <div class="text-6xl font-bold text-gray-800" id="speed-value">--</div>
+            <div class="text-xl font-light text-gray-600 unit" id="speed-unit">Mbps</div>
         </div>
         
-        <div class="speed-container">
-            <div class="speed-value" id="speedValue">0.00</div>
-            <div class="speed-unit" id="speedUnit">Mbps</div>
+        <div class="progress-bar mb-6">
+            <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
         </div>
         
-        <div class="progress-bar" id="progressBar">
-            <div class="progress" id="progress"></div>
-        </div>
-        
-        <div class="status-text" id="statusText">Ready to test your internet speed</div>
-        
-        <button class="test-btn" id="testBtn">
-            <i class="fas fa-play"></i> Start Test
+        <button id="start-test" class="test-button glass-card w-full py-4 rounded-xl text-gray-700 font-medium">
+            Start Test
         </button>
         
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-value" id="pingValue">0 ms</div>
-                <div class="stat-label">Ping</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="jitterValue">0 ms</div>
-                <div class="stat-label">Jitter</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="testTime">0 s</div>
-                <div class="stat-label">Test Time</div>
-            </div>
+        <div class="mt-8 text-xs text-gray-500">
+            Test your download speed in seconds
         </div>
-        
-        <div class="footer">Minimal Speed Test • Glassmorphism Design</div>
     </div>
 
     <script>
-        const testBtn = document.getElementById('testBtn');
-        const speedValue = document.getElementById('speedValue');
-        const speedUnit = document.getElementById('speedUnit');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const progress = document.getElementById('progress');
-        const pingValue = document.getElementById('pingValue');
-        const jitterValue = document.getElementById('jitterValue');
-        const testTimeEl = document.getElementById('testTime');
-        
-        // File URLs for testing (with cache busting)
-        const testFiles = [
-            'https://speedtest.ftp.otenet.gr/files/test1Mb.db',
-            'https://speedtest.ftp.otenet.gr/files/test5Mb.db',
-            'https://speedtest.ftp.otenet.gr/files/test10Mb.db',
-            'https://speedtest.ftp.otenet.gr/files/test20Mb.db'
-        ];
-        
-        // File sizes in bytes
-        const fileSizes = [
-            1048576,   // 1MB
-            5242880,   // 5MB
-            10485760,  // 10MB
-            20971520   // 20MB
-        ];
-        
-        let currentTest = 0;
-        let totalDownloaded = 0;
-        let totalTime = 0;
-        let testStartTime;
-        let testRunning = false;
-        let pingResults = [];
-        let testStartTimestamp;
-        
-        testBtn.addEventListener('click', startSpeedTest);
-        
-        function startSpeedTest() {
-            if (testRunning) return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const startButton = document.getElementById('start-test');
+            const speedValue = document.getElementById('speed-value');
+            const speedUnit = document.getElementById('speed-unit');
+            const progressBar = document.getElementById('progress-bar');
             
-            testRunning = true;
-            testBtn.disabled = true;
-            testBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Testing...';
-            statusText.textContent = "Initializing test...";
-            speedValue.textContent = "0.00";
-            speedUnit.textContent = "Mbps";
-            progressBar.style.display = "block";
-            progress.style.width = "0%";
+            let testInProgress = false;
+            let testStartTime;
+            let downloadedBytes = 0;
+            let testInterval;
+            let speedResults = [];
             
-            // Reset stats
-            pingValue.textContent = "0 ms";
-            jitterValue.textContent = "0 ms";
-            testTimeEl.textContent = "0 s";
-            pingResults = [];
-            testStartTimestamp = Date.now();
-            
-            currentTest = 0;
-            totalDownloaded = 0;
-            totalTime = 0;
-            
-            // Start with ping test
-            pingTest();
-        }
-        
-        function pingTest() {
-            statusText.textContent = "Measuring ping...";
-            
-            const pingTestImage = new Image();
-            const startTime = Date.now();
-            
-            pingTestImage.onload = function() {
-                const ping = Date.now() - startTime;
-                pingResults.push(ping);
+            startButton.addEventListener('click', function() {
+                if (testInProgress) return;
                 
-                if (pingResults.length < 4) {
-                    // Run multiple ping tests for accuracy
-                    setTimeout(pingTest, 300);
-                } else {
-                    calculatePing();
-                    runNextTest();
+                startTest();
+            });
+            
+            function startTest() {
+                testInProgress = true;
+                speedValue.textContent = '0';
+                speedUnit.textContent = 'Mbps';
+                progressBar.style.width = '0%';
+                startButton.textContent = 'Testing...';
+                startButton.classList.add('opacity-70');
+                
+                // Reset test variables
+                testStartTime = new Date().getTime();
+                downloadedBytes = 0;
+                speedResults = [];
+                
+                // Create a dummy file URL (random data)
+                const testFileUrl = 'https://httpbin.org/bytes/1048576?r=' + Math.random();
+                
+                // Start multiple downloads to get accurate speed
+                for (let i = 0; i < 4; i++) {
+                    downloadTestFile(testFileUrl);
                 }
-            };
-            
-            pingTestImage.onerror = function() {
-                if (pingResults.length < 4) {
-                    setTimeout(pingTest, 300);
-                } else {
-                    calculatePing();
-                    runNextTest();
-                }
-            };
-            
-            // Use a small image for ping test
-            pingTestImage.src = 'https://via.placeholder.com/1x1.png?text=.' + '?cache=' + Date.now();
-        }
-        
-        function calculatePing() {
-            // Calculate average ping
-            const avgPing = pingResults.reduce((a, b) => a + b, 0) / pingResults.length;
-            
-            // Calculate jitter (standard deviation)
-            const squaredDiffs = pingResults.map(ping => Math.pow(ping - avgPing, 2));
-            const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / pingResults.length;
-            const jitter = Math.sqrt(avgSquaredDiff);
-            
-            pingValue.textContent = Math.round(avgPing) + " ms";
-            jitterValue.textContent = Math.round(jitter) + " ms";
-        }
-        
-        function runNextTest() {
-            if (currentTest >= testFiles.length) {
-                finalizeResults();
-                return;
+                
+                // Update speed every 500ms
+                testInterval = setInterval(updateSpeed, 500);
+                
+                // Set timeout to end test after 15 seconds max
+                setTimeout(endTest, 15000);
             }
             
-            const fileUrl = testFiles[currentTest] + '?cache=' + Date.now();
-            statusText.textContent = `Testing download speed (${currentTest + 1}/${testFiles.length})...`;
-            
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', fileUrl, true);
-            
-            testStartTime = Date.now();
-            
-            xhr.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    const percent = (e.loaded / e.total) * 100;
-                    const overallPercent = (currentTest * 25) + (percent / 4);
-                    progress.style.width = overallPercent + '%';
-                    
-                    // Update test time in real-time
-                    const elapsed = (Date.now() - testStartTimestamp) / 1000;
-                    testTimeEl.textContent = elapsed.toFixed(1) + " s";
-                }
-            };
-            
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    const duration = (Date.now() - testStartTime) / 1000; // in seconds
-                    totalTime += duration;
-                    totalDownloaded += fileSizes[currentTest];
-                    
-                    // Calculate current speed in Mbps
-                    const currentSpeed = ((fileSizes[currentTest] * 8) / duration) / 1048576;
-                    updateSpeedDisplay(currentSpeed);
-                    
-                    currentTest++;
-                    setTimeout(runNextTest, 300); // Brief pause between tests
-                } else {
-                    testFailed();
-                }
-            };
-            
-            xhr.onerror = function() {
-                testFailed();
-            };
-            
-            xhr.send();
-        }
-        
-        function updateSpeedDisplay(speed) {
-            let displaySpeed;
-            let unit;
-            
-            if (speed < 1) {
-                displaySpeed = (speed * 1000).toFixed(2); // Convert to kbps
-                unit = "kbps";
-            } else if (speed >= 1000) {
-                displaySpeed = (speed / 1000).toFixed(2); // Convert to Gbps
-                unit = "Gbps";
-            } else {
-                displaySpeed = speed.toFixed(2);
-                unit = "Mbps";
+            function downloadTestFile(url) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'arraybuffer';
+                
+                xhr.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        downloadedBytes += e.loaded;
+                    }
+                };
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        downloadedBytes += xhr.response.byteLength;
+                    }
+                };
+                
+                xhr.send();
             }
             
-            speedValue.textContent = displaySpeed;
-            speedUnit.textContent = unit;
-        }
-        
-        function finalizeResults() {
-            const totalSpeed = ((totalDownloaded * 8) / totalTime) / 1048576; // Mbps
-            updateSpeedDisplay(totalSpeed);
+            function updateSpeed() {
+                const currentTime = new Date().getTime();
+                const elapsedTime = (currentTime - testStartTime) / 1000; // in seconds
+                
+                if (elapsedTime > 0) {
+                    const speedBps = downloadedBytes / elapsedTime;
+                    const speedKbps = speedBps * 8 / 1024;
+                    const speedMbps = speedKbps / 1024;
+                    const speedGbps = speedMbps / 1024;
+                    
+                    // Store the current speed
+                    speedResults.push(speedMbps);
+                    
+                    // Update progress bar (capped at 100%)
+                    const progressPercent = Math.min(elapsedTime / 5 * 100, 100);
+                    progressBar.style.width = progressPercent + '%';
+                    
+                    // Display appropriate unit
+                    if (speedGbps >= 1) {
+                        speedValue.textContent = speedGbps.toFixed(2);
+                        speedUnit.textContent = 'Gbps';
+                    } else if (speedMbps >= 10) {
+                        speedValue.textContent = speedMbps.toFixed(1);
+                        speedUnit.textContent = 'Mbps';
+                    } else if (speedMbps >= 1) {
+                        speedValue.textContent = speedMbps.toFixed(2);
+                        speedUnit.textContent = 'Mbps';
+                    } else {
+                        speedValue.textContent = speedKbps.toFixed(0);
+                        speedUnit.textContent = 'Kbps';
+                    }
+                }
+            }
             
-            progress.style.width = "100%";
-            statusText.textContent = "Test completed!";
-            
-            // Final test time
-            const totalTestTime = (Date.now() - testStartTimestamp) / 1000;
-            testTimeEl.textContent = totalTestTime.toFixed(1) + " s";
-            
-            setTimeout(() => {
-                testRunning = false;
-                testBtn.disabled = false;
-                testBtn.innerHTML = '<i class="fas fa-redo"></i> Test Again';
-                progressBar.style.display = "none";
-            }, 1500);
-        }
-        
-        function testFailed() {
-            statusText.textContent = "Test failed. Please try again.";
-            speedValue.textContent = "0.00";
-            speedUnit.textContent = "Mbps";
-            
-            testRunning = false;
-            testBtn.disabled = false;
-            testBtn.innerHTML = '<i class="fas fa-play"></i> Start Test';
-            progressBar.style.display = "none";
-        }
+            function endTest() {
+                clearInterval(testInterval);
+                testInProgress = false;
+                startButton.textContent = 'Test Again';
+                startButton.classList.remove('opacity-70');
+                
+                // Calculate average speed from the last 5 results
+                const validResults = speedResults.slice(-5);
+                if (validResults.length > 0) {
+                    const avgSpeed = validResults.reduce((a, b) => a + b, 0) / validResults.length;
+                    
+                    if (avgSpeed >= 1024) {
+                        speedValue.textContent = (avgSpeed / 1024).toFixed(2);
+                        speedUnit.textContent = 'Gbps';
+                    } else if (avgSpeed >= 10) {
+                        speedValue.textContent = avgSpeed.toFixed(1);
+                        speedUnit.textContent = 'Mbps';
+                    } else if (avgSpeed >= 1) {
+                        speedValue.textContent = avgSpeed.toFixed(2);
+                        speedUnit.textContent = 'Mbps';
+                    } else {
+                        speedValue.textContent = (avgSpeed * 1024).toFixed(0);
+                        speedUnit.textContent = 'Kbps';
+                    }
+                }
+                
+                progressBar.style.width = '100%';
+            }
+        });
     </script>
 </body>
 </html>
