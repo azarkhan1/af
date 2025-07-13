@@ -1,10 +1,17 @@
 {
   "name": "Azar App",
   "short_name": "Azar",
+  "description": "فروشگاه زعفران آذر، با کیفیت‌ترین زعفران افغانستان",
+  "id": "/",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
+  "dir": "ltr",
+  "lang": "fa",
   "background_color": "#ffffff",
   "theme_color": "#ff9900",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-192.png",
