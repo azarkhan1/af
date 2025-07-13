@@ -19,16 +19,19 @@ body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     color: var(--text-color);
-    overflow: hidden;
-    height: 100vh;
+    /* به جای overflow: hidden، اجازه اسکرول در صفحات خیلی کوچک را می‌دهیم */
+    overflow-x: hidden;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #1a1a2e;
+    padding: 20px 0; /* کمی فاصله از بالا و پایین برای صفحات کوچک */
+    box-sizing: border-box;
 }
 
 .background-image {
-    position: absolute;
+    position: fixed; /* تغییر به fixed تا با اسکرول حرکت نکند */
     top: 0;
     left: 0;
     width: 100%;
@@ -36,14 +39,16 @@ body {
     background: url('https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=2070') no-repeat center center/cover;
     filter: blur(20px) brightness(0.6);
     transform: scale(1.1);
+    z-index: -1;
 }
 
 .container {
     position: relative;
     z-index: 1;
     width: 100%;
+    /* تغییر عرض به درصد با یک حداکثر مشخص */
     max-width: 700px;
-    padding: 20px;
+    padding: 0 20px; /* فاصله از کناره‌های صفحه */
     box-sizing: border-box;
 }
 
@@ -53,13 +58,15 @@ body {
     -webkit-backdrop-filter: blur(15px);
     border-radius: 20px;
     border: 1px solid var(--border-color);
-    padding: 40px;
+    /* استفاده از clamp برای فاصله‌گذاری (padding) هوشمند */
+    padding: clamp(25px, 5vw, 40px);
     text-align: center;
     box-shadow: 0 8px 32px 0 var(--shadow-color);
 }
 
 h1 {
-    font-size: 2.5rem;
+    /* استفاده از clamp برای اندازه فونت سیال */
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
     margin-top: 0;
     margin-bottom: 30px;
     font-weight: 600;
@@ -71,8 +78,10 @@ h1 {
 }
 
 .gauge {
-    width: 220px;
-    height: 220px;
+    /* استفاده از clamp برای اندازه عقربه هوشمند */
+    width: clamp(180px, 30vw, 220px);
+    /* حفظ نسبت ۱:۱ (مربع) به صورت خودکار */
+    aspect-ratio: 1;
     border-radius: 50%;
     background: var(--gauge-bg);
     margin: 0 auto;
@@ -96,8 +105,9 @@ h1 {
 }
 
 .gauge-inner {
-    width: 180px;
-    height: 180px;
+    /* استفاده از درصد برای هماهنگی با اندازه gauge */
+    width: 82%;
+    height: 82%;
     border-radius: 50%;
     background-color: #1a1a2e;
     z-index: 1;
@@ -108,7 +118,8 @@ h1 {
 }
 
 .gauge-value {
-    font-size: 3rem;
+    /* فونت سیال برای عدد سرعت */
+    font-size: clamp(2.5rem, 8vw, 3.2rem);
     font-weight: 700;
     transition: color 0.3s;
 }
@@ -122,7 +133,7 @@ h1 {
 .status-text {
     margin-top: 20px;
     font-size: 1.1rem;
-    height: 20px; /* Reserve space to prevent layout shift */
+    height: 20px;
     font-weight: 500;
     transition: opacity 0.3s;
 }
@@ -156,8 +167,9 @@ h1 {
 /* Results */
 .results-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
+    /* ستون‌ها به صورت هوشمند تعدادشان را تنظیم می‌کنند */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
     width: 100%;
     text-align: left;
 }
@@ -177,57 +189,35 @@ h1 {
 }
 
 .result-value {
-    font-size: 1.3rem;
+    /* فونت سیال برای مقادیر نتایج */
+    font-size: clamp(1rem, 3vw, 1.2rem);
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
+    word-break: break-word; /* برای جلوگیری از سرریز شدن نام‌های طولانی ISP */
 }
 
 #flag-icon {
     width: 24px;
     height: auto;
     border-radius: 3px;
+    flex-shrink: 0; /* جلوگیری از کوچک شدن پرچم */
 }
 
-/* Responsive Design */
+/* با استایل‌های جدید، نیاز به media query های زیاد کمتر می‌شود */
+/* اما این موارد را برای بهینه‌سازی نهایی نگه می‌داریم */
 @media (max-width: 768px) {
-    .speed-test-wrapper {
-        padding: 25px;
-    }
-    h1 {
-        font-size: 2rem;
-    }
-    .gauge {
-        width: 180px;
-        height: 180px;
-    }
-    .gauge-inner {
-        width: 150px;
-        height: 150px;
-    }
-    .gauge-value {
-        font-size: 2.5rem;
-    }
     #start-btn {
         padding: 12px 25px;
-        font-size: 1rem;
-        margin-bottom: 30px;
-    }
-    .results-container {
-        grid-template-columns: 1fr 1fr;
-    }
-    .result-value {
         font-size: 1.1rem;
+        margin-bottom: 30px;
     }
 }
 
 @media (max-width: 480px) {
-    .speed-test-wrapper {
-        padding: 20px;
-        margin: 0 10px;
-    }
     .results-container {
-        grid-template-columns: 1fr;
+        /* در موبایل‌های کوچک، نمایش به صورت دو ستونه بهتر است */
+        grid-template-columns: 1fr 1fr;
     }
 }
