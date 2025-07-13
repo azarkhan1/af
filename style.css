@@ -1,1 +1,233 @@
+/* Register the --p property for smooth animation */
+@property --p {
+    syntax: '<integer>';
+    initial-value: 0;
+    inherits: false;
+}
 
+:root {
+    --text-color: #f0f0f0;
+    --accent-color: #00e1ff;
+    --bg-color-light: rgba(255, 255, 255, 0.15);
+    --border-color: rgba(255, 255, 255, 0.2);
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --gauge-bg: rgba(0, 0, 0, 0.2);
+    --gauge-gradient: conic-gradient(from 180deg at 50% 50%, #00c6ff, #0072ff);
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a2e;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=2070') no-repeat center center/cover;
+    filter: blur(20px) brightness(0.6);
+    transform: scale(1.1);
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.speed-test-wrapper {
+    background: var(--bg-color-light);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* Gauge Styles */
+.gauge-container {
+    margin-bottom: 30px;
+}
+
+.gauge {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: var(--gauge-bg);
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 5px solid var(--border-color);
+    transition: background 0.3s;
+}
+
+.gauge::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--gauge-gradient);
+    mask: conic-gradient(from -90deg, #000 calc(var(--p) * 1%), #0000 0);
+    transition: transform 0.2s linear;
+}
+
+.gauge-inner {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background-color: #1a1a2e;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.gauge-value {
+    font-size: 3rem;
+    font-weight: 700;
+    transition: color 0.3s;
+}
+
+.gauge-unit {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.status-text {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    height: 20px; /* Reserve space to prevent layout shift */
+    font-weight: 500;
+    transition: opacity 0.3s;
+}
+
+/* Button */
+#start-btn {
+    background: var(--accent-color);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 40px;
+}
+
+#start-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 225, 255, 0.2);
+}
+
+#start-btn:disabled {
+    background-color: #555;
+    color: #aaa;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Results */
+.results-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    width: 100%;
+    text-align: left;
+}
+
+.result-item {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.result-label {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-bottom: 5px;
+}
+
+.result-value {
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#flag-icon {
+    width: 24px;
+    height: auto;
+    border-radius: 3px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .speed-test-wrapper {
+        padding: 25px;
+    }
+    h1 {
+        font-size: 2rem;
+    }
+    .gauge {
+        width: 180px;
+        height: 180px;
+    }
+    .gauge-inner {
+        width: 150px;
+        height: 150px;
+    }
+    .gauge-value {
+        font-size: 2.5rem;
+    }
+    #start-btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+    .results-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    .result-value {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .speed-test-wrapper {
+        padding: 20px;
+        margin: 0 10px;
+    }
+    .results-container {
+        grid-template-columns: 1fr;
+    }
+}
