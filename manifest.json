@@ -1,7 +1,7 @@
 {
   "name": "Azar App",
   "short_name": "Azar",
-  "description": "فروشگاه زعفران آذر، با کیفیت‌ترین زعفران افغانستان",
+  "description": "azar",
   "id": "/",
   "start_url": "./index.html",
   "scope": "./",
