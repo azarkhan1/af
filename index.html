@@ -3,139 +3,486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>internet test speed </title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Nexus SpeedTest</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icons/6.11.0/css/flag-icons.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --text: #2b2d42;
+            --text-light: #8d99ae;
+            --bg: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #dfe7f5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
         }
         
         .glass-card {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+            padding: 30px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .header p {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .speed-display {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .speed-value {
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: all 0.5s ease;
+        }
+        
+        .speed-unit {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+        
+        .test-status {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .gauge-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0 30px;
+        }
+        
+        .gauge-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .info-card.active {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .flag-icon {
+            font-size: 20px;
+            margin-right: 6px;
+            vertical-align: middle;
         }
         
         .test-button {
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 100%);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            width: 100%;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .test-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
         }
         
         .test-button:active {
             transform: translateY(0);
         }
         
-        .speed-display {
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: all 0.5s ease;
+        .test-button:disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
         
-        .unit {
-            opacity: 0.7;
-            font-weight: 300;
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
         }
         
-        .progress-bar {
-            height: 6px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 3px;
-            overflow: hidden;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            border-radius: 3px;
-            transition: width 0.3s ease;
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .testing {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 20px;
+            }
+            
+            .speed-value {
+                font-size: 60px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
-    <div class="glass-card w-full max-w-md p-8 text-center">
-        <h1 class="text-2xl font-light mb-2 text-gray-700">internet test speed</h1>
-        <p class="text-sm text-gray-500 mb-8">speed test </p>
-        
-        <div class="speed-display mb-8">
-            <div class="text-6xl font-bold text-gray-800" id="speed-value">--</div>
-            <div class="text-xl font-light text-gray-600 unit" id="speed-unit">Mbps</div>
-        </div>
-        
-        <div class="progress-bar mb-6">
-            <div class="progress-fill" id="progress-bar" style="width: 0%"></div>
-        </div>
-        
-        <button id="start-test" class="test-button glass-card w-full py-4 rounded-xl text-gray-700 font-medium">
-            Start Test
-        </button>
-        
-        <div class="mt-8 text-xs text-gray-500">
-            Test your download speed in seconds
+<body>
+    <div class="container">
+        <div class="glass-card">
+            <div class="header">
+                <h1>Nexus SpeedTest</h1>
+                <p>Measure your internet connection performance</p>
+            </div>
+            
+            <div class="speed-display">
+                <div class="test-status" id="test-status">Ready</div>
+                <div class="speed-value" id="speed-value">0</div>
+                <div class="speed-unit" id="speed-unit">Mbps</div>
+            </div>
+            
+            <div class="gauge-container">
+                <div class="gauge-fill" id="gauge-fill"></div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card" id="ping-card">
+                    <div class="info-label">Ping</div>
+                    <div class="info-value" id="ping-value">--</div>
+                </div>
+                <div class="info-card" id="download-card">
+                    <div class="info-label">Download</div>
+                    <div class="info-value" id="download-value">--</div>
+                </div>
+                <div class="info-card" id="ip-card">
+                    <div class="info-label">IP Address</div>
+                    <div class="info-value" id="ip-value">--</div>
+                </div>
+                <div class="info-card" id="location-card">
+                    <div class="info-label">Location</div>
+                    <div class="info-value" id="location-value">--</div>
+                </div>
+            </div>
+            
+            <button id="start-test" class="test-button">
+                <span id="button-text">Start Speed Test</span>
+            </button>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const startButton = document.getElementById('start-test');
+            const buttonText = document.getElementById('button-text');
             const speedValue = document.getElementById('speed-value');
             const speedUnit = document.getElementById('speed-unit');
-            const progressBar = document.getElementById('progress-bar');
+            const testStatus = document.getElementById('test-status');
+            const gaugeFill = document.getElementById('gauge-fill');
+            const pingValue = document.getElementById('ping-value');
+            const downloadValue = document.getElementById('download-value');
+            const ipValue = document.getElementById('ip-value');
+            const locationValue = document.getElementById('location-value');
             
+            // Card elements for animation
+            const pingCard = document.getElementById('ping-card');
+            const downloadCard = document.getElementById('download-card');
+            const ipCard = document.getElementById('ip-card');
+            const locationCard = document.getElementById('location-card');
+            
+            // Test variables
             let testInProgress = false;
+            let testPhase = 'idle'; // 'idle', 'ping', 'download', 'upload'
             let testStartTime;
+            let pingStartTime;
             let downloadedBytes = 0;
+            let uploadedBytes = 0;
             let testInterval;
-            let speedResults = [];
+            let downloadResults = [];
+            let pingResults = [];
+            let uploadResults = [];
             
-            startButton.addEventListener('click', function() {
+            // Initialize
+            fetchIPInfo();
+            
+            // Event Listeners
+            startButton.addEventListener('click', startTestHandler);
+            
+            // Functions
+            function startTestHandler() {
                 if (testInProgress) return;
-                
                 startTest();
-            });
+            }
+            
+            async function fetchIPInfo() {
+                try {
+                    // First try ipinfo.io
+                    try {
+                        const response = await fetch('https://ipinfo.io/json?token=8a8a3a9a8a3a9a');
+                        const data = await response.json();
+                        updateIPInfo(data);
+                        return;
+                    } catch (e) {
+                        console.log('ipinfo.io failed, trying ipapi.co');
+                    }
+                    
+                    // Fallback to ipapi.co
+                    const response = await fetch('https://ipapi.co/json/');
+                    const data = await response.json();
+                    updateIPInfo(data);
+                } catch (error) {
+                    console.error('Error fetching IP info:', error);
+                    ipValue.textContent = 'Error';
+                    locationValue.textContent = 'Error';
+                }
+            }
+            
+            function updateIPInfo(data) {
+                ipValue.textContent = data.ip || '--';
+                
+                if (data.country) {
+                    const countryCode = (data.country || '').toLowerCase();
+                    let locationText = '';
+                    
+                    if (countryCode) {
+                        locationText += `<span class="fi fi-${countryCode} flag-icon"></span>`;
+                    }
+                    
+                    if (data.city && data.region) {
+                        locationText += `${data.city}, ${data.region}`;
+                    } else if (data.city) {
+                        locationText += data.city;
+                    } else if (data.region) {
+                        locationText += data.region;
+                    } else if (data.country_name) {
+                        locationText += data.country_name;
+                    } else {
+                        locationText += '--';
+                    }
+                    
+                    locationValue.innerHTML = locationText;
+                } else {
+                    locationValue.textContent = '--';
+                }
+            }
             
             function startTest() {
                 testInProgress = true;
+                startButton.disabled = true;
+                buttonText.textContent = 'Testing...';
+                startButton.innerHTML = '<div class="spinner"></div><span id="button-text">Testing...</span>';
+                
+                // Reset all values
                 speedValue.textContent = '0';
                 speedUnit.textContent = 'Mbps';
-                progressBar.style.width = '0%';
-                startButton.textContent = 'Testing...';
-                startButton.classList.add('opacity-70');
+                gaugeFill.style.width = '0%';
+                pingValue.textContent = '--';
+                downloadValue.textContent = '--';
                 
-                // Reset test variables
+                // Reset card animations
+                resetCardAnimations();
+                
+                // Start with ping test
+                testPhase = 'ping';
+                testStatus.textContent = 'Measuring Ping...';
+                pingCard.classList.add('active');
+                startPingTest();
+            }
+            
+            function resetCardAnimations() {
+                pingCard.classList.remove('active');
+                downloadCard.classList.remove('active');
+                ipCard.classList.remove('active');
+                locationCard.classList.remove('active');
+            }
+            
+            function startPingTest() {
+                pingStartTime = new Date().getTime();
+                pingResults = [];
+                
+                // Make multiple ping requests for accuracy
+                for (let i = 0; i < 5; i++) {
+                    pingTestRequest();
+                }
+                
+                // After 3 seconds, move to download test
+                setTimeout(() => {
+                    if (testPhase === 'ping') {
+                        calculatePing();
+                        startDownloadTest();
+                    }
+                }, 3000);
+            }
+            
+            function pingTestRequest() {
+                const start = new Date().getTime();
+                // Use a small file for ping test
+                fetch(`https://httpbin.org/bytes/16?r=${Math.random()}`, { 
+                    cache: 'no-store',
+                    mode: 'no-cors'
+                })
+                .then(() => {
+                    const latency = new Date().getTime() - start;
+                    pingResults.push(latency);
+                })
+                .catch(() => {
+                    // Ignore errors for ping test
+                });
+            }
+            
+            function calculatePing() {
+                if (pingResults.length > 0) {
+                    // Calculate median ping for more accurate result
+                    pingResults.sort((a, b) => a - b);
+                    const medianIndex = Math.floor(pingResults.length / 2);
+                    const medianPing = pingResults[medianIndex];
+                    pingValue.textContent = Math.round(medianPing) + ' ms';
+                } else {
+                    pingValue.textContent = 'Error';
+                }
+            }
+            
+            function startDownloadTest() {
+                testPhase = 'download';
+                testStatus.textContent = 'Testing Download Speed...';
+                pingCard.classList.remove('active');
+                downloadCard.classList.add('active');
+                
                 testStartTime = new Date().getTime();
                 downloadedBytes = 0;
-                speedResults = [];
+                downloadResults = [];
                 
-                // Create a dummy file URL (random data)
-                const testFileUrl = 'https://httpbin.org/bytes/1048576?r=' + Math.random();
-                
-                // Start multiple downloads to get accurate speed
+                // Create multiple download connections for more accurate results
                 for (let i = 0; i < 4; i++) {
-                    downloadTestFile(testFileUrl);
+                    downloadTestFile();
                 }
                 
                 // Update speed every 500ms
-                testInterval = setInterval(updateSpeed, 500);
+                testInterval = setInterval(updateDownloadSpeed, 500);
                 
-                // Set timeout to end test after 15 seconds max
-                setTimeout(endTest, 15000);
+                // After 10 seconds, move to upload test
+                setTimeout(() => {
+                    if (testPhase === 'download') {
+                        clearInterval(testInterval);
+                        startUploadTest();
+                    }
+                }, 10000);
             }
             
-            function downloadTestFile(url) {
+            function downloadTestFile() {
+                const fileSize = 5 * 1024 * 1024; // 5MB
+                const url = `https://httpbin.org/bytes/${fileSize}?r=${Math.random()}`;
+                
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', url, true);
                 xhr.responseType = 'arraybuffer';
@@ -155,67 +502,144 @@
                 xhr.send();
             }
             
-            function updateSpeed() {
+            function updateDownloadSpeed() {
                 const currentTime = new Date().getTime();
                 const elapsedTime = (currentTime - testStartTime) / 1000; // in seconds
                 
                 if (elapsedTime > 0) {
                     const speedBps = downloadedBytes / elapsedTime;
-                    const speedKbps = speedBps * 8 / 1024;
-                    const speedMbps = speedKbps / 1024;
-                    const speedGbps = speedMbps / 1024;
+                    const speedMbps = (speedBps * 8) / (1024 * 1024);
                     
                     // Store the current speed
-                    speedResults.push(speedMbps);
+                    downloadResults.push(speedMbps);
                     
-                    // Update progress bar (capped at 100%)
-                    const progressPercent = Math.min(elapsedTime / 5 * 100, 100);
-                    progressBar.style.width = progressPercent + '%';
+                    // Update gauge (capped at 100%)
+                    const progressPercent = Math.min(elapsedTime / 10 * 100, 100);
+                    gaugeFill.style.width = progressPercent + '%';
                     
-                    // Display appropriate unit
-                    if (speedGbps >= 1) {
-                        speedValue.textContent = speedGbps.toFixed(2);
-                        speedUnit.textContent = 'Gbps';
+                    // Display speed with appropriate precision
+                    if (speedMbps >= 100) {
+                        speedValue.textContent = Math.round(speedMbps);
                     } else if (speedMbps >= 10) {
                         speedValue.textContent = speedMbps.toFixed(1);
-                        speedUnit.textContent = 'Mbps';
-                    } else if (speedMbps >= 1) {
-                        speedValue.textContent = speedMbps.toFixed(2);
-                        speedUnit.textContent = 'Mbps';
                     } else {
-                        speedValue.textContent = speedKbps.toFixed(0);
-                        speedUnit.textContent = 'Kbps';
+                        speedValue.textContent = speedMbps.toFixed(2);
                     }
+                    
+                    speedUnit.textContent = 'Mbps';
+                }
+            }
+            
+            function startUploadTest() {
+                testPhase = 'upload';
+                testStatus.textContent = 'Testing Upload Speed...';
+                downloadCard.classList.remove('active');
+                
+                testStartTime = new Date().getTime();
+                uploadedBytes = 0;
+                uploadResults = [];
+                
+                // Start upload test
+                uploadTestData();
+                
+                // Update speed every 500ms
+                testInterval = setInterval(updateUploadSpeed, 500);
+                
+                // After 10 seconds, end the test
+                setTimeout(() => {
+                    if (testPhase === 'upload') {
+                        endTest();
+                    }
+                }, 10000);
+            }
+            
+            function uploadTestData() {
+                const chunkSize = 1 * 1024 * 1024; // 1MB
+                const data = new Uint8Array(chunkSize);
+                
+                // Fill with random data
+                for (let i = 0; i < data.length; i++) {
+                    data[i] = Math.floor(Math.random() * 256);
+                }
+                
+                const url = 'https://httpbin.org/post';
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', url, true);
+                
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        uploadedBytes += chunkSize;
+                        // Continue uploading until test ends
+                        if (testPhase === 'upload') {
+                            uploadTestData();
+                        }
+                    }
+                };
+                
+                xhr.send(data);
+            }
+            
+            function updateUploadSpeed() {
+                const currentTime = new Date().getTime();
+                const elapsedTime = (currentTime - testStartTime) / 1000; // in seconds
+                
+                if (elapsedTime > 0) {
+                    const speedBps = uploadedBytes / elapsedTime;
+                    const speedMbps = (speedBps * 8) / (1024 * 1024);
+                    
+                    // Store the current speed
+                    uploadResults.push(speedMbps);
+                    
+                    // Update gauge (capped at 100%)
+                    const progressPercent = Math.min(elapsedTime / 10 * 100, 100);
+                    gaugeFill.style.width = progressPercent + '%';
+                    
+                    // Display speed with appropriate precision
+                    if (speedMbps >= 100) {
+                        speedValue.textContent = Math.round(speedMbps);
+                    } else if (speedMbps >= 10) {
+                        speedValue.textContent = speedMbps.toFixed(1);
+                    } else {
+                        speedValue.textContent = speedMbps.toFixed(2);
+                    }
+                    
+                    speedUnit.textContent = 'Mbps';
                 }
             }
             
             function endTest() {
                 clearInterval(testInterval);
                 testInProgress = false;
-                startButton.textContent = 'Test Again';
-                startButton.classList.remove('opacity-70');
+                testPhase = 'idle';
+                testStatus.textContent = 'Test Complete';
+                gaugeFill.style.width = '100%';
                 
-                // Calculate average speed from the last 5 results
-                const validResults = speedResults.slice(-5);
-                if (validResults.length > 0) {
-                    const avgSpeed = validResults.reduce((a, b) => a + b, 0) / validResults.length;
-                    
-                    if (avgSpeed >= 1024) {
-                        speedValue.textContent = (avgSpeed / 1024).toFixed(2);
-                        speedUnit.textContent = 'Gbps';
-                    } else if (avgSpeed >= 10) {
-                        speedValue.textContent = avgSpeed.toFixed(1);
-                        speedUnit.textContent = 'Mbps';
-                    } else if (avgSpeed >= 1) {
-                        speedValue.textContent = avgSpeed.toFixed(2);
-                        speedUnit.textContent = 'Mbps';
-                    } else {
-                        speedValue.textContent = (avgSpeed * 1024).toFixed(0);
-                        speedUnit.textContent = 'Kbps';
-                    }
+                // Reset button
+                startButton.disabled = false;
+                buttonText.textContent = 'Test Again';
+                startButton.innerHTML = '<span id="button-text">Test Again</span>';
+                
+                // Calculate final results
+                calculateFinalResults();
+            }
+            
+            function calculateFinalResults() {
+                // Calculate median download speed
+                if (downloadResults.length > 0) {
+                    downloadResults.sort((a, b) => a - b);
+                    const medianIndex = Math.floor(downloadResults.length / 2);
+                    const medianDownload = downloadResults[medianIndex];
+                    downloadValue.textContent = medianDownload >= 100 ? 
+                        Math.round(medianDownload) : medianDownload.toFixed(1);
                 }
                 
-                progressBar.style.width = '100%';
+                // Show the highest speed achieved during test
+                if (downloadResults.length > 0) {
+                    const maxDownload = Math.max(...downloadResults);
+                    speedValue.textContent = maxDownload >= 100 ? 
+                        Math.round(maxDownload) : maxDownload.toFixed(1);
+                    speedUnit.textContent = 'Mbps';
+                }
             }
         });
     </script>
